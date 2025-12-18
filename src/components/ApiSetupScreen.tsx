@@ -6,23 +6,29 @@ import { BlurView } from 'expo-blur';
 
 interface ApiSetupScreenProps {
   onBack: () => void;
-  onComplete: (keys: { openai: string; elevenlabs: string }) => void;
+  onComplete: (keys: { openai: string; elevenlabs: string; veryfi?: { clientId: string; username: string; apiKey: string } }) => void;
 }
 
 export function ApiSetupScreen({ onBack, onComplete }: ApiSetupScreenProps) {
   const [keys, setKeys] = useState({
     openai: '',
     elevenlabs: '',
+    veryfi: { clientId: '', username: '', apiKey: '' }
   });
   const [showOpenai, setShowOpenai] = useState(false);
   const [showElevenlabs, setShowElevenlabs] = useState(false);
+  const [showVeryfi, setShowVeryfi] = useState(false);
 
   const handleContinue = () => {
     if (!keys.openai.trim()) {
       Alert.alert('Missing API Key', 'Please enter your OpenAI API key to continue.');
       return;
     }
-    onComplete(keys);
+    onComplete({
+      openai: keys.openai,
+      elevenlabs: keys.elevenlabs,
+      veryfi: keys.veryfi.clientId ? keys.veryfi : undefined
+    });
   };
 
   const handleSkip = () => {
@@ -133,6 +139,65 @@ export function ApiSetupScreen({ onBack, onComplete }: ApiSetupScreenProps) {
                 </View>
                 <Text className="text-xs text-muted-foreground mt-2">
                   For premium voice synthesis (optional)
+                </Text>
+              </LinearGradient>
+            </BlurView>
+
+            <BlurView intensity={15} className="rounded-2xl overflow-hidden">
+              <LinearGradient
+                colors={['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)']}
+                className="p-6"
+              >
+                <View className="flex-row items-center gap-3 mb-4">
+                  <View className="w-10 h-10 rounded-xl bg-blue-500/80 items-center justify-center">
+                    <Text className="text-white font-bold">📷</Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-lg font-semibold text-foreground">Veryfi OCR</Text>
+                    <Text className="text-xs text-muted-foreground">Optional - for medicine scanning</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setShowVeryfi(!showVeryfi)}
+                    className="w-8 h-8 rounded-lg bg-muted/50 items-center justify-center"
+                  >
+                    <Text className="text-muted-foreground">{showVeryfi ? '🙈' : '👁️'}</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View className="space-y-3">
+                  <View className="bg-card/60 rounded-xl border border-border/50">
+                    <TextInput
+                      className="w-full p-4 text-foreground"
+                      placeholder="Client ID"
+                      placeholderTextColor="#94a3b8"
+                      value={keys.veryfi.clientId}
+                      onChangeText={(text) => setKeys(prev => ({ ...prev, veryfi: { ...prev.veryfi, clientId: text } }))}
+                      secureTextEntry={!showVeryfi}
+                    />
+                  </View>
+                  <View className="bg-card/60 rounded-xl border border-border/50">
+                    <TextInput
+                      className="w-full p-4 text-foreground"
+                      placeholder="Username"
+                      placeholderTextColor="#94a3b8"
+                      value={keys.veryfi.username}
+                      onChangeText={(text) => setKeys(prev => ({ ...prev, veryfi: { ...prev.veryfi, username: text } }))}
+                      secureTextEntry={!showVeryfi}
+                    />
+                  </View>
+                  <View className="bg-card/60 rounded-xl border border-border/50">
+                    <TextInput
+                      className="w-full p-4 text-foreground"
+                      placeholder="API Key"
+                      placeholderTextColor="#94a3b8"
+                      value={keys.veryfi.apiKey}
+                      onChangeText={(text) => setKeys(prev => ({ ...prev, veryfi: { ...prev.veryfi, apiKey: text } }))}
+                      secureTextEntry={!showVeryfi}
+                    />
+                  </View>
+                </View>
+                <Text className="text-xs text-muted-foreground mt-2">
+                  Get credentials from veryfi.com for medicine scanning
                 </Text>
               </LinearGradient>
             </BlurView>

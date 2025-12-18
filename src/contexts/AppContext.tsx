@@ -15,6 +15,11 @@ interface AppState {
   apiKeys: {
     openai: string;
     elevenlabs: string;
+    veryfi: {
+      clientId: string;
+      username: string;
+      apiKey: string;
+    };
   };
   medications: Medication[];
   streak: number;
@@ -23,7 +28,7 @@ interface AppState {
 interface AppContextType {
   state: AppState;
   setOnboarded: (value: boolean) => void;
-  setApiKeys: (keys: { openai: string; elevenlabs: string }) => void;
+  setApiKeys: (keys: { openai: string; elevenlabs: string; veryfi?: { clientId: string; username: string; apiKey: string } }) => void;
   addMedication: (med: Omit<Medication, 'id' | 'taken'>) => void;
   toggleMedication: (id: string) => void;
   removeMedication: (id: string) => void;
@@ -44,7 +49,7 @@ const initialMedications: Medication[] = [
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>({
     isOnboarded: false,
-    apiKeys: { openai: '', elevenlabs: '' },
+    apiKeys: { openai: '', elevenlabs: '', veryfi: { clientId: '', username: '', apiKey: '' } },
     medications: initialMedications,
     streak: 12,
   });
@@ -56,6 +61,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const streak = await getConfig<number>('streak');
       const openaiKey = await getSecure('openai_key');
       const elevenlabsKey = await getSecure('elevenlabs_key');
+      const veryfiClientId = await getSecure('veryfi_client_id');
+      const veryfiUsername = await getSecure('veryfi_username');
+      const veryfiApiKey = await getSecure('veryfi_api_key');
 
       setState(prev => ({
         ...prev,
@@ -65,6 +73,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         apiKeys: {
           openai: openaiKey ?? '',
           elevenlabs: elevenlabsKey ?? '',
+          veryfi: {
+            clientId: veryfiClientId ?? '',
+            username: veryfiUsername ?? '',
+            apiKey: veryfiApiKey ?? ''
+          }
         },
       }));
     } catch (error) {
@@ -83,6 +96,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (state.apiKeys.elevenlabs) {
         await saveSecure('elevenlabs_key', state.apiKeys.elevenlabs);
       }
+      if (state.apiKeys.veryfi.clientId) {
+        await saveSecure('veryfi_client_id', state.apiKeys.veryfi.clientId);
+        await saveSecure('veryfi_username', state.apiKeys.veryfi.username);
+        await saveSecure('veryfi_api_key', state.apiKeys.veryfi.apiKey);
+      }
     } catch (error) {
       console.error('Failed to save data:', error);
     }
@@ -100,8 +118,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState(prev => ({ ...prev, isOnboarded: value }));
   };
 
-  const setApiKeys = (keys: { openai: string; elevenlabs: string }) => {
-    setState(prev => ({ ...prev, apiKeys: keys }));
+  const setApiKeys = (keys: { openai: string; elevenlabs: string; veryfi?: { clientId: string; username: string; apiKey: string } }) => {
+    setState(prev => ({ 
+      ...prev, 
+      apiKeys: { 
+        ...prev.apiKeys, 
+        ...keys,
+        veryfi: keys.veryfi || prev.apiKeys.veryfi
+      } 
+    }));
   };
 
   const addMedication = (med: Omit<Medication, 'id' | 'taken'>) => {

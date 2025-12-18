@@ -16,6 +16,9 @@ export default function HomeScreen() {
       case 'report':
         // TODO: Add report screen
         break;
+      case 'scan':
+        router.push('/scan');
+        break;
       default:
         break;
     }

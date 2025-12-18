@@ -130,7 +130,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 { icon: '➕', label: 'Add Med', action: () => onNavigate('add') },
                 { icon: '🎤', label: 'AI Assistant', action: () => onNavigate('assistant') },
                 { icon: '📊', label: 'Reports', action: () => onNavigate('report') },
-                { icon: '📷', label: 'Scan', action: () => {} },
+                { icon: '📷', label: 'Scan', action: () => onNavigate('scan') },
               ].map((item, index) => (
                 <TouchableOpacity
                   key={index}

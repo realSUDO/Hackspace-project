@@ -22,7 +22,7 @@ export default function Index() {
     setStep('api-setup');
   };
 
-  const handleApiComplete = (keys: { openai: string; elevenlabs: string }) => {
+  const handleApiComplete = (keys: { openai: string; elevenlabs: string; veryfi?: { clientId: string; username: string; apiKey: string } }) => {
     setApiKeys(keys);
     setOnboarded(true);
     router.replace('/(tabs)');

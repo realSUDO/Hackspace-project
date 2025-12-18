@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { useApp } from '@/src/contexts/AppContext';
 import { BottomNav } from '@/src/components/BottomNav';
 
 export default function AddMedicationScreen() {
   const { addMedication } = useApp();
+  const params = useLocalSearchParams();
   const [medication, setMedication] = useState({
     name: '',
     dosage: '',
-    time: '',
+    time: '08:00',
     frequency: 'daily',
   });
+
+  useEffect(() => {
+    if (params.prefilled) {
+      try {
+        const prefilledData = JSON.parse(params.prefilled as string);
+        setMedication(prefilledData);
+      } catch (error) {
+        console.error('Error parsing prefilled data:', error);
+      }
+    }
+  }, [params.prefilled]);
 
   const handleSave = () => {
     if (!medication.name || !medication.dosage || !medication.time) {
@@ -36,7 +49,14 @@ export default function AddMedicationScreen() {
           {/* Header */}
           <View className="mb-8">
             <Text className="text-2xl font-bold text-foreground">Add Medication</Text>
-            <Text className="text-muted-foreground">Add a new medication to your schedule</Text>
+            <Text className="text-muted-foreground">
+              {params.prefilled ? 'Information detected from scan' : 'Add a new medication to your schedule'}
+            </Text>
+            {params.prefilled && (
+              <Text className="text-green-400 text-sm mt-1">
+                ✓ Scanned data loaded
+              </Text>
+            )}
           </View>
 
           {/* Form */}
