@@ -18,9 +18,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-ml-kit/text-recognition": "^2.0.0",
     "@react-navigation/native": "^7.1.25",
-<<<<<<< HEAD
     "babel-preset-expo": "^54.0.8",
-=======
     "@react-navigation/stack": "^7.6.12",
     "@supabase/supabase-js": "^2.89.0",
     "@types/crypto-js": "^4.2.2",
@@ -29,7 +27,6 @@
     "babel-preset-expo": "^54.0.8",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.2.3",
->>>>>>> ragpipeline
     "expo": "~54.0.27",
     "expo-av": "~16.0.8",
     "expo-blur": "~15.0.8",
