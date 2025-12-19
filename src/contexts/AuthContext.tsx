@@ -1,41 +1,62 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
-import type { User } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-}
+export type AuthData = {
+  session?: Session | null;
+  isLoading: boolean;
+  isLoggedIn: boolean;
+};
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
+export const AuthContext = createContext<AuthData>({
+  session: undefined,
+  isLoading: true,
+  isLoggedIn: false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | undefined | null>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+    const fetchSession = async () => {
+      setIsLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Error fetching session:', error);
+      }
+
+      setSession(session);
+      setIsLoading(false);
+    };
+
+    fetchSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      // console.log('Auth state changed:', { event: _event, session }); // Removed verbose logging
+      setSession(session);
+      setIsLoading(false);
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        isLoading,
+        isLoggedIn: session != undefined,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

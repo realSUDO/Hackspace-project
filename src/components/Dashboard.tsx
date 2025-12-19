@@ -6,6 +6,7 @@ import { BlurView } from 'expo-blur';
 import { useApp } from '../contexts/AppContext';
 import { ProgressRing } from './ProgressRing';
 import { BottomNav } from './BottomNav';
+import { supabase } from '../services/supabase';
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;
@@ -13,6 +14,13 @@ interface DashboardProps {
 
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { state, toggleMedication } = useApp();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+    }
+  };
   
   const takenCount = state.medications.filter(m => m.taken).length;
   const totalCount = state.medications.length;
@@ -45,12 +53,22 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <Text className="text-muted-foreground text-sm">Good morning</Text>
                 <Text className="text-2xl font-bold text-foreground">Dashboard</Text>
               </View>
-              <LinearGradient
-                colors={['#94a3b8', '#64748b']}
-                style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
-              >
-                <Text className="text-primary-foreground text-2xl">💊</Text>
-              </LinearGradient>
+              <View className="flex-row items-center space-x-2">
+                <TouchableOpacity onPress={handleSignOut}>
+                  <LinearGradient
+                    colors={['#ef4444', '#dc2626']}
+                    style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}
+                  >
+                    <Text className="text-white text-sm font-medium">Sign Out</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+                <LinearGradient
+                  colors={['#94a3b8', '#64748b']}
+                  style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Text className="text-primary-foreground text-2xl">💊</Text>
+                </LinearGradient>
+              </View>
             </View>
           </View>
           
@@ -131,6 +149,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 { icon: '🎤', label: 'AI Assistant', action: () => onNavigate('assistant') },
                 { icon: '📊', label: 'Reports', action: () => onNavigate('report') },
                 { icon: '📷', label: 'Scan', action: () => onNavigate('scan') },
+                { icon: '📄', label: 'My Documents', action: () => onNavigate('docs') },
               ].map((item, index) => (
                 <TouchableOpacity
                   key={index}

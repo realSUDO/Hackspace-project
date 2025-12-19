@@ -19,6 +19,9 @@ export default function HomeScreen() {
       case 'scan':
         router.push('/scan');
         break;
+      case 'docs':
+        router.push('/docs');
+        break;
       default:
         break;
     }

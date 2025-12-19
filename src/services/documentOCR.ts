@@ -3,6 +3,7 @@ import { supabase } from './supabase';
 
 export interface DocumentOCRResult {
   success: boolean;
+  extractedText?: string;
   documentId?: string;
   error?: string;
 }
@@ -13,66 +14,91 @@ export class DocumentOCRService {
     title: string
   ): Promise<DocumentOCRResult> {
     try {
-      console.log('🔄 Step 1: Starting OCR');
+      console.log('🔄 Starting OCR with image:', imageUri);
 
-      // 1️⃣ OCR
+      // Extract text using MLKit
       const result = await TextRecognition.recognize(imageUri);
       const extractedText = result.text;
+      
+      console.log('📝 Extracted text:', extractedText);
 
-      if (!extractedText) {
-        throw new Error('No text extracted');
+      if (!extractedText || extractedText.trim().length === 0) {
+        return {
+          success: false,
+          error: 'No text found in image. Try a clearer photo.',
+          extractedText: ''
+        };
       }
 
-      console.log('✅ Step 2: OCR completed');
+      // Try to save to database if user is authenticated
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          console.log('💾 User authenticated, saving to database...');
+          console.log('👤 User ID:', user.id);
+          console.log('📄 Document data:', { title, contentLength: extractedText.length });
+          
+          const { data, error } = await supabase
+            .from('documents')
+            .insert({
+              title,
+              content: extractedText,
+              user_id: user.id,
+            })
+            .select('id')
+            .single();
 
-      // 2️⃣ Get authenticated user (THIS IS THE UUID SOURCE)
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+          if (error) {
+            console.log('❌ Database save failed:', error);
+            console.log('❌ Error details:', {
+              message: error.message,
+              details: error.details,
+              hint: error.hint,
+              code: error.code
+            });
+            // Still return success with extracted text
+            return {
+              success: true,
+              extractedText,
+              error: `Database error: ${error.message}`
+            };
+          }
 
-      if (authError) {
-        console.log('❌ Auth error:', authError);
-        throw authError;
+          console.log('✅ Document saved with ID:', data.id);
+          return {
+            success: true,
+            extractedText,
+            documentId: data.id
+          };
+        } else {
+          console.log('⚠️ No authenticated user found');
+          // User not authenticated, just return extracted text
+          return {
+            success: true,
+            extractedText,
+            error: 'User not authenticated'
+          };
+        }
+      } catch (dbError: any) {
+        console.log('❌ Database connection error:', dbError);
+        console.log('❌ Full error:', {
+          message: dbError.message,
+          stack: dbError.stack,
+          name: dbError.name
+        });
+        // Still return success with extracted text
+        return {
+          success: true,
+          extractedText,
+          error: `Database connection failed: ${dbError.message}`
+        };
       }
-
-      if (!user) {
-        throw new Error('User not logged in');
-      }
-
-      const userId = user.id; // ✅ UUID from Supabase Auth
-      console.log('✅ Step 3: User authenticated:', userId);
-
-      // 3️⃣ Insert into Supabase
-      console.log('🔄 Step 4: Inserting into Supabase...');
-
-      const { data, error } = await supabase
-        .from('documents')
-        .insert({
-          title,
-          content: extractedText,
-          user_id: userId,
-        })
-        .select('id')
-        .single();
-
-      if (error) {
-        console.log('❌ Step 5: Supabase insert failed:', error);
-        throw error;
-      }
-
-      console.log('✅ Step 6: Document saved:', data.id);
-
-      return {
-        success: true,
-        documentId: data.id,
-      };
     } catch (err: any) {
-      console.log('❌ Error in processDocument:', err);
-
+      console.log('❌ OCR Error:', err);
       return {
         success: false,
-        error: 'Document OCR failed',
+        error: `OCR failed: ${err.message}`,
       };
     }
   }

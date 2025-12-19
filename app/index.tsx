@@ -1,22 +1,32 @@
 import React from 'react';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/src/contexts/AuthContext';
 import { WelcomeScreen } from '@/src/components/WelcomeScreen';
-import { useApp } from '@/src/contexts/AppContext';
+import { View, ActivityIndicator } from 'react-native';
 
 export default function Index() {
-  const { setOnboarded, state } = useApp();
+  const { isLoggedIn, isLoading } = useAuth();
   const router = useRouter();
 
   React.useEffect(() => {
-    if (state.isOnboarded) {
-      router.replace('/(tabs)');
+    if (!isLoading) {
+      if (isLoggedIn) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/login');
+      }
     }
-  }, [state.isOnboarded]);
+  }, [isLoggedIn, isLoading]);
 
-  const handleGetStarted = () => {
-    setOnboarded(true);
-    router.replace('/(tabs)');
-  };
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a' }}>
+        <ActivityIndicator size="large" color="#3b82f6" />
+      </View>
+    );
+  }
 
-  return <WelcomeScreen onGetStarted={handleGetStarted} />;
+  // Fallback - shouldn't normally be seen
+  return <WelcomeScreen onGetStarted={() => router.replace('/login')} />;
 }

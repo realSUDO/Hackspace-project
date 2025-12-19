@@ -31,7 +31,7 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
       setIsProcessing(true);
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -65,7 +65,7 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
       setIsProcessing(true);
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -89,12 +89,18 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
     console.log('Process result:', result);
 
     if (result.success) {
-      Alert.alert('Success', `Document processed and saved! ID: ${result.documentId}`, [
-        { text: 'OK', onPress: () => onNavigate('docs') }
-      ]);
+      let message = `Extracted Text:\n\n${result.extractedText?.substring(0, 200)}${result.extractedText && result.extractedText.length > 200 ? '...' : ''}`;
+      
+      if (result.documentId) {
+        message = `✅ Saved to Database!\nDocument ID: ${result.documentId}\n\n${message}`;
+      } else if (result.error) {
+        message = `⚠️ ${result.error}\n\n${message}`;
+      }
+      
+      Alert.alert('OCR Success!', message, [{ text: 'OK' }]);
       setTitle('');
     } else {
-      Alert.alert('Error', result.error || 'Failed to process document');
+      Alert.alert('OCR Failed', result.error || 'Failed to extract text');
     }
   };
 
