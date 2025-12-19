@@ -39,6 +39,7 @@ export function AssistantScreen({ onBack }: AssistantScreenProps) {
     let start = async () => {
       await AudioSession.startAudioSession();
       
+      // Auto-connect once on mount
       if (!connection.isConnectionActive) {
         console.log('Auto-connecting to voice assistant...');
         connection.connect();
@@ -48,7 +49,7 @@ export function AssistantScreen({ onBack }: AssistantScreenProps) {
     return () => {
       AudioSession.stopAudioSession();
     };
-  }, [connection]);
+  }, []); // Empty dependency array - only run once on mount
 
   return (
     <SafeAreaView style={styles.container}>
