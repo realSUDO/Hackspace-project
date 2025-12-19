@@ -10,6 +10,33 @@ interface Medication {
   frequency: string;
 }
 
+interface BloodPressureReading {
+  systolic: number;
+  diastolic: number;
+  date: string;
+  status: string;
+}
+
+interface CholesterolReading {
+  total: number;
+  ldl: number;
+  hdl: number;
+  date: string;
+  status: string;
+}
+
+interface Allergy {
+  id: string;
+  allergen: string;
+  severity: 'Mild' | 'Moderate' | 'Severe';
+  reaction: string;
+}
+
+interface MedicalHistory {
+  bloodPressure: BloodPressureReading;
+  cholesterol: CholesterolReading;
+}
+
 interface AppState {
   isOnboarded: boolean;
   apiKeys: {
@@ -23,6 +50,8 @@ interface AppState {
   };
   medications: Medication[];
   streak: number;
+  medicalHistory: MedicalHistory;
+  allergies: Allergy[];
 }
 
 interface AppContextType {
@@ -32,6 +61,10 @@ interface AppContextType {
   addMedication: (med: Omit<Medication, 'id' | 'taken'>) => void;
   toggleMedication: (id: string) => void;
   removeMedication: (id: string) => void;
+  updateBloodPressure: (reading: Omit<BloodPressureReading, 'date' | 'status'>) => void;
+  updateCholesterol: (reading: Omit<CholesterolReading, 'date' | 'status'>) => void;
+  addAllergy: (allergy: Omit<Allergy, 'id'>) => void;
+  removeAllergy: (id: string) => void;
   loadData: () => Promise<void>;
   saveData: () => Promise<void>;
 }
@@ -52,6 +85,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     apiKeys: { openai: '', elevenlabs: '', veryfi: { clientId: '', username: '', apiKey: '' } },
     medications: initialMedications,
     streak: 12,
+    medicalHistory: {
+      bloodPressure: { systolic: 128, diastolic: 82, date: '2024-01-15', status: 'Normal' },
+      cholesterol: { total: 195, ldl: 115, hdl: 45, date: '2024-01-10', status: 'Borderline' }
+    },
+    allergies: [
+      { id: '1', allergen: 'Penicillin', severity: 'Severe', reaction: 'Rash, difficulty breathing' },
+      { id: '2', allergen: 'Shellfish', severity: 'Moderate', reaction: 'Hives, swelling' },
+      { id: '3', allergen: 'Pollen', severity: 'Mild', reaction: 'Sneezing, runny nose' }
+    ],
   });
 
   const loadData = async () => {
@@ -59,6 +101,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const onboarded = await getConfig<boolean>('isOnboarded');
       const medications = await getConfig<Medication[]>('medications');
       const streak = await getConfig<number>('streak');
+      const medicalHistory = await getConfig<MedicalHistory>('medicalHistory');
+      const allergies = await getConfig<Allergy[]>('allergies');
       const openaiKey = await getSecure('openai_key');
       const elevenlabsKey = await getSecure('elevenlabs_key');
       const veryfiClientId = await getSecure('veryfi_client_id');
@@ -70,6 +114,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
         isOnboarded: onboarded ?? false,
         medications: medications ?? initialMedications,
         streak: streak ?? 12,
+        medicalHistory: medicalHistory ?? {
+          bloodPressure: { systolic: 128, diastolic: 82, date: '2024-01-15', status: 'Normal' },
+          cholesterol: { total: 195, ldl: 115, hdl: 45, date: '2024-01-10', status: 'Borderline' }
+        },
+        allergies: allergies ?? [
+          { id: '1', allergen: 'Penicillin', severity: 'Severe', reaction: 'Rash, difficulty breathing' },
+          { id: '2', allergen: 'Shellfish', severity: 'Moderate', reaction: 'Hives, swelling' },
+          { id: '3', allergen: 'Pollen', severity: 'Mild', reaction: 'Sneezing, runny nose' }
+        ],
         apiKeys: {
           openai: openaiKey ?? '',
           elevenlabs: elevenlabsKey ?? '',
@@ -90,6 +143,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await saveConfig('isOnboarded', state.isOnboarded);
       await saveConfig('medications', state.medications);
       await saveConfig('streak', state.streak);
+      await saveConfig('medicalHistory', state.medicalHistory);
+      await saveConfig('allergies', state.allergies);
       if (state.apiKeys.openai) {
         await saveSecure('openai_key', state.apiKeys.openai);
       }
@@ -154,6 +209,55 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const updateBloodPressure = (reading: Omit<BloodPressureReading, 'date' | 'status'>) => {
+    const status = reading.systolic > 140 || reading.diastolic > 90 ? 'High' : 
+                   reading.systolic < 90 || reading.diastolic < 60 ? 'Low' : 'Normal';
+    
+    setState(prev => ({
+      ...prev,
+      medicalHistory: {
+        ...prev.medicalHistory,
+        bloodPressure: {
+          ...reading,
+          date: new Date().toISOString().split('T')[0],
+          status
+        }
+      }
+    }));
+  };
+
+  const updateCholesterol = (reading: Omit<CholesterolReading, 'date' | 'status'>) => {
+    const status = reading.total > 240 ? 'High' : 
+                   reading.total > 200 ? 'Borderline' : 'Normal';
+    
+    setState(prev => ({
+      ...prev,
+      medicalHistory: {
+        ...prev.medicalHistory,
+        cholesterol: {
+          ...reading,
+          date: new Date().toISOString().split('T')[0],
+          status
+        }
+      }
+    }));
+  };
+
+  const addAllergy = (allergy: Omit<Allergy, 'id'>) => {
+    const newAllergy: Allergy = {
+      ...allergy,
+      id: Date.now().toString(),
+    };
+    setState(prev => ({ ...prev, allergies: [...prev.allergies, newAllergy] }));
+  };
+
+  const removeAllergy = (id: string) => {
+    setState(prev => ({
+      ...prev,
+      allergies: prev.allergies.filter(allergy => allergy.id !== id),
+    }));
+  };
+
   return (
     <AppContext.Provider value={{ 
       state, 
@@ -162,6 +266,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addMedication, 
       toggleMedication, 
       removeMedication,
+      updateBloodPressure,
+      updateCholesterol,
+      addAllergy,
+      removeAllergy,
       loadData,
       saveData
     }}>
