@@ -14,7 +14,7 @@ export default function HomeScreen() {
         router.push('/modal');
         break;
       case 'report':
-        // TODO: Add report screen
+        router.push('/report');
         break;
       case 'scan':
         router.push('/scan');
