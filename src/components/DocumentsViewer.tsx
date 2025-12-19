@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -14,6 +14,8 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
   const [documents, setDocuments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingDocument, setEditingDocument] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const searchService = new DocumentSearchService();
 
   useEffect(() => {
@@ -30,6 +32,26 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
       Alert.alert('Error', result.error || 'Failed to load documents');
     }
     setIsLoading(false);
+  };
+
+  const performSearch = async () => {
+    if (!searchQuery.trim()) {
+      loadDocuments(); // Show all documents if search is empty
+      return;
+    }
+
+    setIsSearching(true);
+    const result = await searchService.searchDocuments(searchQuery);
+    
+    if (result.success) {
+      setDocuments(result.results || []);
+      if (result.results?.length === 0) {
+        Alert.alert('No Results', `No documents found for "${searchQuery}"`);
+      }
+    } else {
+      Alert.alert('Search Error', result.error || 'Failed to search documents');
+    }
+    setIsSearching(false);
   };
 
   const showDocument = (doc: any) => {
@@ -102,9 +124,33 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
             <Text className="text-3xl font-bold text-white text-center mb-2">
               My Documents
             </Text>
-            <Text className="text-gray-400 text-center">
+            <Text className="text-gray-400 text-center mb-4">
               {documents.length} documents saved
             </Text>
+            
+            {/* Search Bar */}
+            <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-gray-600">
+              <View className="p-4 flex-row items-center">
+                <TextInput
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Search documents..."
+                  placeholderTextColor="#64748b"
+                  className="flex-1 text-white text-lg mr-3"
+                  style={{ color: '#f8fafc' }}
+                />
+                <TouchableOpacity onPress={performSearch} disabled={isSearching}>
+                  <LinearGradient
+                    colors={['#3b82f6', '#1d4ed8']}
+                    className="rounded-xl px-4 py-2"
+                  >
+                    <Text className="text-white font-medium">
+                      {isSearching ? '🔍' : 'Search'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </BlurView>
           </View>
 
           {isLoading ? (

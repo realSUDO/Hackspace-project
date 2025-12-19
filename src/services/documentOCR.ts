@@ -43,7 +43,7 @@ export class DocumentOCRService {
             .from('documents')
             .insert({
               title,
-              content: extractedText,
+              full_text: extractedText,  // Use full_text for tsvector indexing
               user_id: user.id,
             })
             .select('id')
