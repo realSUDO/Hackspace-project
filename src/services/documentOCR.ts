@@ -9,18 +9,88 @@ export interface DocumentOCRResult {
 }
 
 export class DocumentOCRService {
+  async extractTextFromImage(imageUri: string): Promise<string> {
+    try {
+      const result = await TextRecognition.recognize(imageUri);
+      return result.text || '';
+    } catch (error) {
+      console.error('Image OCR failed:', error);
+      return '';
+    }
+  }
+
+  async extractTextFromPDF(pdfUri: string): Promise<string> {
+    try {
+      console.log('Sending PDF to backend for text extraction:', pdfUri);
+      
+      // Read PDF file as base64
+      const response = await fetch(pdfUri);
+      const blob = await response.blob();
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1]); // Remove data:application/pdf;base64, prefix
+        };
+        reader.readAsDataURL(blob);
+      });
+
+      // Call Python backend for PDF text extraction
+      const extractResponse = await fetch('https://pdf-parser-production-186a.up.railway.app/extract-pdf-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pdf_base64: base64 }),
+      });
+
+      if (!extractResponse.ok) {
+        throw new Error(`Backend error: ${extractResponse.status}`);
+      }
+
+      const result = await extractResponse.json();
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      console.log('Extracted text from backend:', result.text.substring(0, 200));
+      return result.text;
+      
+    } catch (error) {
+      console.log('PDF backend extraction failed:', error);
+      throw new Error('PDF text extraction failed. Please convert to images and upload those instead.');
+    }
+  }
+
   async processDocument(
-    imageUri: string,
-    title: string
+    fileUri: string,
+    title: string,
+    isPDF: boolean = false
   ): Promise<DocumentOCRResult> {
     try {
-      console.log('🔄 Starting OCR with image:', imageUri);
+      console.log('🔄 Starting document processing:', { fileUri, isPDF });
 
-      // Extract text using MLKit
-      const result = await TextRecognition.recognize(imageUri);
-      const extractedText = result.text;
+      let extractedText = '';
       
-      console.log('📝 Extracted text:', extractedText);
+      if (isPDF) {
+        // Handle PDF - try text extraction, don't fallback to OCR since it can't handle PDFs
+        try {
+          extractedText = await this.extractTextFromPDF(fileUri);
+        } catch (error) {
+          console.log('PDF processing not supported:', error);
+          return {
+            success: false,
+            error: 'PDF text extraction requires backend processing. Please:\n\n1. Take screenshots of PDF pages\n2. Upload the images instead\n\nFull PDF support coming soon!'
+          };
+        }
+      } else {
+        // Handle image - use OCR
+        const result = await TextRecognition.recognize(fileUri);
+        extractedText = result.text;
+      }
+      
+      console.log('📝 Extracted text length:', extractedText.length);
 
       if (!extractedText || extractedText.trim().length === 0) {
         return {

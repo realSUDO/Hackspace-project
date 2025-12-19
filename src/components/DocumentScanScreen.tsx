@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { DocumentOCRService } from '../services/documentOCR';
 
 interface DocumentScanScreenProps {
@@ -56,30 +57,48 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
     }
 
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Photo library permission is required');
+      setIsProcessing(true);
+
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['image/*', 'application/pdf'],
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) {
+        setIsProcessing(false);
         return;
       }
 
-      setIsProcessing(true);
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images',
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        const imageUri = result.assets[0].uri;
-        await processDocument(imageUri);
+      const asset = Array.isArray(result.assets) ? result.assets[0] : result;
+      const fileUri = asset.uri;
+      const fileName = asset.name || 'document';
+      
+      if (fileName.toLowerCase().endsWith('.pdf')) {
+        await processPDF(fileUri);
+      } else {
+        await processDocument(fileUri);
       }
     } catch (error) {
       console.error('Error uploading:', error);
       Alert.alert('Error', 'Failed to upload document');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const processPDF = async (pdfUri: string) => {
+    try {
+      const result = await documentOCRService.processDocument(pdfUri, title, true);
+      
+      if (result.success) {
+        Alert.alert('Success', 'PDF processed and saved successfully!');
+        setTitle('');
+      } else {
+        Alert.alert('Error', result.error || 'No text found - couldn\'t add document. Please try a different file.');
+      }
+    } catch (error) {
+      console.error('PDF processing error:', error);
+      Alert.alert('Error', 'No text found - couldn\'t add document.');
     }
   };
 
@@ -174,7 +193,7 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
                 <View className="p-4 items-center">
                   <Text className="text-2xl mb-2">📁</Text>
                   <Text className="text-lg font-semibold text-foreground mb-1">
-                    Upload from Gallery
+                    📄 Upload Image/PDF
                   </Text>
                   <Text className="text-muted-foreground text-center text-sm">
                     Choose from photo library

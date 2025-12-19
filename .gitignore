@@ -44,3 +44,4 @@ yarn-error.*
 # Custom ignores
 todo.md
 agora/
+pdf-backend/
