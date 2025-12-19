@@ -26,7 +26,7 @@ export class DocumentSearchService {
       try {
         const { data: exactData, error: exactError } = await supabase
           .from('documents')
-          .select('id, title, full_text, created_at')
+          .select('id, title, full_text, created_at, file_url')
           .textSearch('search_index', query, { type: 'plain' })
           .limit(10);
 
@@ -48,7 +48,7 @@ export class DocumentSearchService {
         for (const pattern of fuzzyPatterns) {
           const { data: fuzzyData, error: fuzzyError } = await supabase
             .from('documents')
-            .select('id, title, full_text, created_at')
+            .select('id, title, full_text, created_at, file_url')
             .or(`full_text.ilike.${pattern},title.ilike.${pattern}`)
             .limit(10);
 
@@ -66,7 +66,7 @@ export class DocumentSearchService {
           const wordPattern = words.map(w => `%${w}%`).join('|');
           const { data: wordData, error: wordError } = await supabase
             .from('documents')
-            .select('id, title, full_text, created_at')
+            .select('id, title, full_text, created_at, file_url')
             .or(`full_text.ilike.%${words[0]}%,title.ilike.%${words[0]}%`)
             .limit(10);
 
@@ -100,7 +100,7 @@ export class DocumentSearchService {
 
       const { data, error } = await supabase
         .from('documents')
-        .select('id, title, full_text, created_at')
+        .select('id, title, full_text, created_at, file_url')
         .order('created_at', { ascending: false });
 
       if (error) {

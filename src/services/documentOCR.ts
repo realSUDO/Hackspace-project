@@ -109,12 +109,42 @@ export class DocumentOCRService {
           console.log('👤 User ID:', user.id);
           console.log('📄 Document data:', { title, contentLength: extractedText.length });
           
+          // Upload original file to Supabase Storage
+          let fileUrl = null;
+          try {
+            const fileExt = isPDF ? 'pdf' : 'jpg';
+            const fileName = `${Date.now()}.${fileExt}`;
+            
+            // Read file as ArrayBuffer for better compatibility
+            const response = await fetch(fileUri);
+            const arrayBuffer = await response.arrayBuffer();
+            
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(`${user.id}/${fileName}`, arrayBuffer, {
+                contentType: isPDF ? 'application/pdf' : 'image/jpeg',
+                upsert: false
+              });
+              
+            if (uploadError) {
+              console.error('File upload error:', uploadError);
+              // Continue without file URL - document will still save
+            } else {
+              fileUrl = uploadData.path;
+              console.log('✅ File uploaded to:', fileUrl);
+            }
+          } catch (uploadErr) {
+            console.error('File upload failed:', uploadErr);
+            // Continue without file URL - document will still save
+          }
+          
           const { data, error } = await supabase
             .from('documents')
             .insert({
               title,
               full_text: extractedText,  // Use full_text for tsvector indexing
               user_id: user.id,
+              file_url: fileUrl, // Store the file path
             })
             .select('id')
             .single();

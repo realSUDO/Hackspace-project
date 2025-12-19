@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, TextInput, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { DocumentSearchService } from '../services/documentSearch';
+import { supabase } from '../services/supabase';
+import * as IntentLauncher from 'expo-intent-launcher';
 import { DocumentEditor } from './DocumentEditor';
 
 interface DocumentsViewerProps {
@@ -71,6 +73,43 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
         { text: 'Delete', style: 'destructive', onPress: () => deleteDocument(doc.id) }
       ]
     );
+  };
+
+  const viewDocument = (doc: any) => {
+    if (doc.file_url) {
+      // Get the public URL for the file
+      const { data } = supabase.storage.from('documents').getPublicUrl(doc.file_url);
+      const publicUrl = data.publicUrl;
+      
+      Alert.alert(
+        'View Document', 
+        `${doc.title}\n\nFile Type: ${doc.file_url.endsWith('.pdf') ? 'PDF' : 'Image'}`,
+        [
+          { 
+            text: 'Open File', 
+            onPress: async () => {
+              try {
+                if (Platform.OS === 'android') {
+                  // Force Android to show "Open with" chooser
+                  await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+                    data: publicUrl,
+                    flags: 1,
+                    type: doc.file_url.endsWith('.pdf') ? 'application/pdf' : 'image/*'
+                  });
+                } else {
+                  await Linking.openURL(publicUrl);
+                }
+              } catch (error) {
+                Alert.alert('Error', 'Could not open file');
+              }
+            }
+          },
+          { text: 'Cancel' }
+        ]
+      );
+    } else {
+      Alert.alert('File Not Available', 'Original file not stored for this document.');
+    }
   };
 
   const editDocument = (doc: any) => {
@@ -191,6 +230,13 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
                       </TouchableOpacity>
                       
                       <View className="ml-3 flex-col space-y-2">
+                        <TouchableOpacity
+                          onPress={() => viewDocument(doc)}
+                          className="justify-center items-center w-10 h-10 rounded-full bg-green-500/20"
+                        >
+                          <Text className="text-green-400 text-lg">👁️</Text>
+                        </TouchableOpacity>
+                        
                         <TouchableOpacity 
                           onPress={() => editDocument(doc)} 
                           className="justify-center items-center w-10 h-10 rounded-full bg-blue-500/20"
