@@ -29,17 +29,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const nextMed = state.medications.find(m => !m.taken);
 
   return (
-    <View className="flex-1">
-      {/* Background gradient */}
-      <LinearGradient
-        colors={['#1e293b', '#0f172a', '#020617']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
-      
-      {/* Background glow effects */}
-      <View className="absolute top-1/4 left-1/2 w-96 h-96 rounded-full bg-primary/5 -translate-x-1/2 pointer-events-none" />
-      <View className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-secondary/10 pointer-events-none" />
-
+    <View className="flex-1 bg-gray-50">
       <SafeAreaView className="flex-1">
         <ScrollView 
           className="flex-1" 
@@ -47,57 +37,46 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <View className="p-6 pb-4">
-            <View className="flex-row items-center justify-between mb-2">
+          <View className="bg-white px-6 py-6 shadow-sm mb-4">
+            <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-muted-foreground text-sm">Good morning</Text>
-                <Text className="text-2xl font-bold text-foreground">Dashboard</Text>
+                <Text className="text-gray-500 text-sm">Good morning</Text>
+                <Text className="text-2xl font-bold text-gray-900">Dashboard</Text>
               </View>
               <View className="flex-row items-center space-x-2">
                 <TouchableOpacity onPress={handleSignOut}>
-                  <LinearGradient
-                    colors={['#ef4444', '#dc2626']}
-                    style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}
-                  >
+                  <View className="bg-red-500 px-4 py-2 rounded-xl">
                     <Text className="text-white text-sm font-medium">Sign Out</Text>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
-                <LinearGradient
-                  colors={['#94a3b8', '#64748b']}
-                  style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <Text className="text-primary-foreground text-2xl">💊</Text>
-                </LinearGradient>
+                <View className="bg-blue-100 w-12 h-12 rounded-full items-center justify-center">
+                  <Text className="text-2xl">💊</Text>
+                </View>
               </View>
             </View>
           </View>
           
-          {/* Progress Section with Real Glass Effect */}
-          <View className="px-6 mb-6">
-            <BlurView intensity={60} className="rounded-3xl overflow-hidden border border-border/30">
-              <LinearGradient
-                colors={['rgba(30, 41, 59, 0.6)', 'rgba(15, 23, 42, 0.4)']}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              />
-              <View className="p-6">
-                <View className="flex-row items-center gap-6">
-                  <ProgressRing progress={progress} size={80} />
-                  <View className="flex-1">
-                    <Text className="text-2xl font-bold text-foreground mb-1">
-                      {takenCount}/{totalCount}
+          {/* Progress Section */}
+          <View className="px-4 mb-6">
+            <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+              <View className="flex-row items-center gap-6">
+                <ProgressRing progress={progress} size={80} />
+                <View className="flex-1">
+                  <Text className="text-2xl font-bold text-gray-900 mb-1">
+                    {takenCount}/{totalCount}
+                  </Text>
+                  <Text className="text-gray-500 mb-2">
+                    Medications taken today
+                  </Text>
+                  <View className="flex-row items-center">
+                    <Text className="text-2xl mr-2">🔥</Text>
+                    <Text className="text-gray-900 font-medium">
+                      {state.streak} day streak
                     </Text>
-                    <Text className="text-muted-foreground mb-2">
-                      Medications taken today
-                    </Text>
-                    <View className="flex-row items-center">
-                      <Text className="text-2xl mr-2">🔥</Text>
-                      <Text className="text-foreground font-medium">
-                        {state.streak} day streak
-                      </Text>
-                    </View>
                   </View>
                 </View>
               </View>
+            </View>
             </BlurView>
           </View>
 
@@ -138,9 +117,9 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </View>
           )}
 
-          {/* Quick Actions with Glass Effect */}
-          <View className="px-6 mb-6">
-            <Text className="text-lg font-semibold text-foreground mb-4">
+          {/* Quick Actions */}
+          <View className="px-4 mb-6">
+            <Text className="text-lg font-semibold text-gray-900 mb-4">
               Quick Actions
             </Text>
             <View className="flex-row flex-wrap gap-3">
@@ -156,16 +135,10 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                   className="flex-1 min-w-[45%]"
                   onPress={item.action}
                 >
-                  <BlurView intensity={30} className="rounded-2xl overflow-hidden border border-border/20">
-                    <LinearGradient
-                      colors={['rgba(30, 41, 59, 0.3)', 'rgba(15, 23, 42, 0.1)']}
-                      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                    />
-                    <View className="p-4">
-                      <Text className="text-2xl mb-2">{item.icon}</Text>
-                      <Text className="text-foreground font-medium">{item.label}</Text>
-                    </View>
-                  </BlurView>
+                  <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                    <Text className="text-2xl mb-2">{item.icon}</Text>
+                    <Text className="text-gray-900 font-medium">{item.label}</Text>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
