@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'expo-router';
 const navItems = [
   { icon: '🏠', label: 'Home', path: '/(tabs)', key: 'home' },
   { icon: '➕', label: 'Add', path: '/(tabs)/explore', key: 'add' },
+  { icon: '📄', label: 'Docs', path: '/docs', key: 'docs' },
   { icon: '📊', label: 'Report', path: '/report', key: 'report' },
   { icon: '💬', label: 'Assistant', path: '/modal', key: 'assistant' },
 ];
@@ -15,7 +16,7 @@ export function BottomNav() {
 
   return (
     <View className="absolute bottom-0 left-0 right-0 z-50">
-      <View className="bg-card/60 border-t border-border/50 px-8 py-4">
+      <View className="bg-card/60 border-t border-border/50 px-4 py-3">
         <View className="flex-row items-center justify-between w-full">
           {navItems.map((item) => {
             const isActive = pathname === item.path || 
@@ -25,20 +26,14 @@ export function BottomNav() {
               <TouchableOpacity
                 key={item.key}
                 onPress={() => router.push(item.path as any)}
-                className="flex flex-col items-center gap-2 py-2 px-8 rounded-xl"
+                className="flex flex-col items-center gap-1 py-2 px-2 rounded-xl"
               >
-                <Text 
-                  key={`${item.key}-icon`}
-                  className={`text-2xl ${isActive ? 'scale-110' : 'scale-100'}`}
-                >
+                <Text className={`text-xl ${isActive ? 'scale-110' : 'scale-100'}`}>
                   {item.icon}
                 </Text>
-                <Text 
-                  key={`${item.key}-label`}
-                  className={`text-xs font-medium ${
+                <Text className={`text-[10px] font-medium ${
                     isActive ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                >
+                  }`}>
                   {item.label}
                 </Text>
                 {isActive && (
