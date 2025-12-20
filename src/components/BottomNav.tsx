@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
-import { Scan, FileSearch, Pill, LoaderCircle, Sparkles } from 'lucide-react-native';
+import { Scan, FileSearch, Pill, LoaderCircle, Sparkles, Plus, Camera } from 'lucide-react-native';
 
 const navItems = [
   { icon: 'pill', label: 'Add', path: '/(tabs)/explore', key: 'add' },
@@ -13,13 +13,28 @@ const navItems = [
 export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
+  const [showScanModal, setShowScanModal] = useState(false);
+
+  const handleScanPress = () => {
+    setShowScanModal(true);
+  };
+
+  const handleAddMedication = () => {
+    setShowScanModal(false);
+    router.push('/scan?autoScan=true');
+  };
+
+  const handleScanDocument = () => {
+    setShowScanModal(false);
+    router.push('/document-scan');
+  };
 
   return (
     <View className="absolute bottom-0 left-0 right-0 z-50">
       {/* Floating Scan Button */}
       <View style={{ position: 'absolute', top: -71, left: '50%', marginLeft: -64, zIndex: 10 }}>
         <TouchableOpacity
-          onPress={() => router.push('/scan' as any)}
+          onPress={handleScanPress}
           className="w-32 h-32 bg-green-400 rounded-full items-center justify-center border-4 border-white"
         >
           <Scan size={40} color="white" />
@@ -82,6 +97,51 @@ export function BottomNav() {
           })}
         </View>
       </View>
+      
+      {/* Scan Modal */}
+      <Modal
+        visible={showScanModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowScanModal(false)}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center">
+          <View className="bg-white rounded-2xl p-6 mx-8 w-80">
+            <Text className="text-xl font-bold text-gray-900 mb-4 text-center">
+              What would you like to do?
+            </Text>
+            
+            <TouchableOpacity
+              onPress={handleAddMedication}
+              className="flex-row items-center bg-blue-50 p-4 rounded-xl mb-3"
+            >
+              <Plus size={24} color="#3b82f6" />
+              <Text className="text-blue-600 font-semibold text-lg ml-3">
+                Add Medication
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={handleScanDocument}
+              className="flex-row items-center bg-green-50 p-4 rounded-xl mb-4"
+            >
+              <Camera size={24} color="#10b981" />
+              <Text className="text-green-600 font-semibold text-lg ml-3">
+                Scan Document
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={() => setShowScanModal(false)}
+              className="bg-gray-100 p-3 rounded-xl"
+            >
+              <Text className="text-gray-600 font-medium text-center">
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

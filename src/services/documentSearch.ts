@@ -19,6 +19,12 @@ export class DocumentSearchService {
     try {
       console.log('🔍 Searching documents for:', query);
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
       // Multi-level search strategy for better matching
       let results: any[] = [];
 
@@ -27,6 +33,7 @@ export class DocumentSearchService {
         const { data: exactData, error: exactError } = await supabase
           .from('documents')
           .select('id, title, full_text, created_at, file_url')
+          .eq('user_id', user.id)
           .textSearch('search_index', query, { type: 'plain' })
           .limit(10);
 
@@ -49,6 +56,7 @@ export class DocumentSearchService {
           const { data: fuzzyData, error: fuzzyError } = await supabase
             .from('documents')
             .select('id, title, full_text, created_at, file_url')
+            .eq('user_id', user.id)
             .or(`full_text.ilike.${pattern},title.ilike.${pattern}`)
             .limit(10);
 
@@ -67,6 +75,7 @@ export class DocumentSearchService {
           const { data: wordData, error: wordError } = await supabase
             .from('documents')
             .select('id, title, full_text, created_at, file_url')
+            .eq('user_id', user.id)
             .or(`full_text.ilike.%${words[0]}%,title.ilike.%${words[0]}%`)
             .limit(10);
 
@@ -98,9 +107,16 @@ export class DocumentSearchService {
     try {
       console.log('📚 Fetching all user documents...');
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
       const { data, error } = await supabase
         .from('documents')
         .select('id, title, full_text, created_at, file_url')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -134,6 +150,12 @@ export class DocumentSearchService {
     try {
       console.log('✏️ Updating document:', id);
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
       const { error } = await supabase
         .from('documents')
         .update({
@@ -141,7 +163,8 @@ export class DocumentSearchService {
           full_text: content,  // Use full_text for tsvector indexing
           updated_at: new Date().toISOString()
         })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) {
         console.log('❌ Update error:', error);
@@ -169,10 +192,17 @@ export class DocumentSearchService {
     try {
       console.log('🗑️ Deleting document:', id);
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
       const { error } = await supabase
         .from('documents')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) {
         console.log('❌ Delete error:', error);

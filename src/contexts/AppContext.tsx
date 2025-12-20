@@ -1,14 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { saveConfig, getConfig, saveSecure, getSecure } from '../services/storage';
+import { MedicationService, Medication } from '../services/medicationService';
 
-interface Medication {
-  id: string;
-  name: string;
-  dosage: string;
-  time: string;
-  taken: boolean;
-  frequency: string;
-}
+
 
 interface BloodPressureReading {
   systolic: number;
@@ -58,7 +52,7 @@ interface AppContextType {
   state: AppState;
   setOnboarded: (value: boolean) => void;
   setApiKeys: (keys: { openai: string; elevenlabs: string; veryfi?: { clientId: string; username: string; apiKey: string } }) => void;
-  addMedication: (med: Omit<Medication, 'id' | 'taken'>) => void;
+  addMedication: (med: Omit<Medication, 'id' | 'taken' | 'user_id' | 'created_at' | 'updated_at'>) => void;
   toggleMedication: (id: string) => void;
   removeMedication: (id: string) => void;
   updateBloodPressure: (reading: Omit<BloodPressureReading, 'date' | 'status'>) => void;
@@ -67,23 +61,17 @@ interface AppContextType {
   removeAllergy: (id: string) => void;
   loadData: () => Promise<void>;
   saveData: () => Promise<void>;
+  loadMedications: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const initialMedications: Medication[] = [
-  { id: '1', name: 'Vitamin D', dosage: '1000 IU', time: '08:00', taken: true, frequency: 'daily' },
-  { id: '2', name: 'Omega-3', dosage: '1000mg', time: '08:00', taken: true, frequency: 'daily' },
-  { id: '3', name: 'Metformin', dosage: '500mg', time: '12:00', taken: true, frequency: 'daily' },
-  { id: '4', name: 'Lisinopril', dosage: '10mg', time: '18:00', taken: false, frequency: 'daily' },
-  { id: '5', name: 'Aspirin', dosage: '81mg', time: '20:00', taken: false, frequency: 'daily' },
-];
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>({
     isOnboarded: false,
     apiKeys: { openai: '', elevenlabs: '', veryfi: { clientId: '', username: '', apiKey: '' } },
-    medications: initialMedications,
+    medications: [],
     streak: 12,
     medicalHistory: {
       bloodPressure: { systolic: 128, diastolic: 82, date: '2024-01-15', status: 'Normal' },
@@ -96,10 +84,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ],
   });
 
+  const medicationService = new MedicationService();
+
+  const loadMedications = async () => {
+    const result = await medicationService.getMedications();
+    if (result.success) {
+      setState(prev => ({ ...prev, medications: result.medications || [] }));
+    }
+  };
+
   const loadData = async () => {
     try {
       const onboarded = await getConfig<boolean>('isOnboarded');
-      const medications = await getConfig<Medication[]>('medications');
       const streak = await getConfig<number>('streak');
       const medicalHistory = await getConfig<MedicalHistory>('medicalHistory');
       const allergies = await getConfig<Allergy[]>('allergies');
@@ -112,7 +108,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setState(prev => ({
         ...prev,
         isOnboarded: onboarded ?? false,
-        medications: medications ?? initialMedications,
         streak: streak ?? 12,
         medicalHistory: medicalHistory ?? {
           bloodPressure: { systolic: 128, diastolic: 82, date: '2024-01-15', status: 'Normal' },
@@ -133,6 +128,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         },
       }));
+      
+      // Load medications from database
+      await loadMedications();
     } catch (error) {
       console.error('Failed to load data:', error);
     }
@@ -141,7 +139,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const saveData = async () => {
     try {
       await saveConfig('isOnboarded', state.isOnboarded);
-      await saveConfig('medications', state.medications);
       await saveConfig('streak', state.streak);
       await saveConfig('medicalHistory', state.medicalHistory);
       await saveConfig('allergies', state.allergies);
@@ -184,29 +181,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const addMedication = (med: Omit<Medication, 'id' | 'taken'>) => {
-    const newMed: Medication = {
-      ...med,
-      id: Date.now().toString(),
-      taken: false,
-    };
-    setState(prev => ({ ...prev, medications: [...prev.medications, newMed] }));
+  const addMedication = async (med: Omit<Medication, 'id' | 'taken' | 'user_id' | 'created_at' | 'updated_at'>) => {
+    const result = await medicationService.addMedication(med);
+    if (result.success) {
+      await loadMedications();
+    }
   };
 
-  const toggleMedication = (id: string) => {
-    setState(prev => ({
-      ...prev,
-      medications: prev.medications.map(med =>
-        med.id === id ? { ...med, taken: !med.taken } : med
-      ),
-    }));
+  const toggleMedication = async (id: string) => {
+    const result = await medicationService.toggleMedication(id);
+    if (result.success) {
+      await loadMedications();
+    }
   };
 
-  const removeMedication = (id: string) => {
-    setState(prev => ({
-      ...prev,
-      medications: prev.medications.filter(med => med.id !== id),
-    }));
+  const deleteMedication = async (id: string) => {
+    const result = await medicationService.deleteMedication(id);
+    if (result.success) {
+      await loadMedications();
+    }
   };
 
   const updateBloodPressure = (reading: Omit<BloodPressureReading, 'date' | 'status'>) => {
@@ -265,13 +258,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setApiKeys, 
       addMedication, 
       toggleMedication, 
-      removeMedication,
+      removeMedication: deleteMedication,
       updateBloodPressure,
       updateCholesterol,
       addAllergy,
       removeAllergy,
       loadData,
-      saveData
+      saveData,
+      loadMedications
     }}>
       {children}
     </AppContext.Provider>

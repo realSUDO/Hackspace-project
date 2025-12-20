@@ -9,13 +9,21 @@ import { MLKitService } from '../services/mlkit';
 
 interface ScanScreenProps {
   onNavigate: (screen: string, data?: any) => void;
+  autoScan?: boolean;
 }
 
-export function ScanScreen({ onNavigate }: ScanScreenProps) {
+export function ScanScreen({ onNavigate, autoScan }: ScanScreenProps) {
   const [isScanning, setIsScanning] = useState(false);
   const { state } = useApp();
   
   const ocrService = new MLKitService();
+
+  // Auto-start scanning if autoScan is true
+  React.useEffect(() => {
+    if (autoScan) {
+      scanMedicine();
+    }
+  }, [autoScan]);
 
   const scanMedicine = async () => {
     try {

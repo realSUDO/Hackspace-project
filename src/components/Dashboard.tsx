@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { X } from 'lucide-react-native';
 import { useApp } from '../contexts/AppContext';
 import { ProgressRing } from './ProgressRing';
 import { BottomNav } from './BottomNav';
@@ -13,7 +14,11 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onNavigate }: DashboardProps) {
-  const { state, toggleMedication } = useApp();
+  const { state, toggleMedication, loadMedications, removeMedication } = useApp();
+
+  React.useEffect(() => {
+    loadMedications();
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -27,6 +32,13 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const progress = totalCount > 0 ? (takenCount / totalCount) * 100 : 0;
   
   const nextMed = state.medications.find(m => !m.taken);
+  
+  // Sort medications: untaken first, taken last
+  const sortedMedications = [...state.medications].sort((a, b) => {
+    if (a.taken && !b.taken) return 1;
+    if (!a.taken && b.taken) return -1;
+    return 0;
+  });
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -65,7 +77,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                   </Text>
                   <View className="flex-row items-center">
                     <Text className="text-4xl mr-3">🔥</Text>
-                    <Text className="text-gray-900 font-medium text-xl">
+                    <Text className="text-gray-400 font-medium text-xl">
                       {state.streak} day streak
                     </Text>
                   </View>
@@ -108,44 +120,56 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               Today's Schedule
             </Text>
             <View>
-              {state.medications.map((med, index) => (
-                <TouchableOpacity key={med.id} onPress={() => toggleMedication(med.id)}>
+              {sortedMedications.map((med, index) => (
+                <View key={med.id}>
                   <View 
-                    className={`bg-white border ${
-                      med.taken ? 'border-green-500' : 'border-gray-400'
-                    } shadow-sm`} 
+                    className={`${
+                      med.taken ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-400'
+                    } border shadow-sm`} 
                     style={{ 
                       borderRadius: 16,
-                      marginBottom: index < state.medications.length - 1 ? 10 : 0
+                      marginBottom: index < sortedMedications.length - 1 ? 10 : 0
                     }}
                   >
                     <View className="p-4">
                       <View className="flex-row items-center justify-between">
-                        <View className="flex-1">
-                          <Text className={`text-xl font-medium ${
-                            med.taken ? 'text-green-600' : 'text-gray-900'
+                        <TouchableOpacity 
+                          onPress={() => toggleMedication(med.id)}
+                          className="flex-1 flex-row items-center justify-between"
+                        >
+                          <View className="flex-1">
+                            <Text className={`text-xl font-medium ${
+                              med.taken ? 'text-gray-500' : 'text-gray-900'
+                            }`}>
+                              {med.name}
+                            </Text>
+                            <Text className={`text-lg ${
+                              med.taken ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
+                              {med.dosage} • {med.time}
+                            </Text>
+                          </View>
+                          <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+                            med.taken 
+                              ? 'bg-green-500 border-green-500' 
+                              : 'border-gray-200'
                           }`}>
-                            {med.name}
-                          </Text>
-                          <Text className={`text-lg ${
-                            med.taken ? 'text-green-500' : 'text-gray-500'
-                          }`}>
-                            {med.dosage} • {med.time}
-                          </Text>
-                        </View>
-                        <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
-                          med.taken 
-                            ? 'bg-green-500 border-green-500' 
-                            : 'border-gray-200'
-                        }`}>
-                          {med.taken && (
-                            <Text className="text-white text-xs">✓</Text>
-                          )}
-                        </View>
+                            {med.taken && (
+                              <Text className="text-white text-xs">✓</Text>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity
+                          onPress={() => removeMedication(med.id)}
+                          className="ml-3 p-2 rounded-full bg-red-50"
+                        >
+                          <X size={16} color="#dc2626" />
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
               ))}
             </View>
           </View>

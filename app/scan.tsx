@@ -4,6 +4,7 @@ import { ScanScreen } from '@/src/components/ScanScreen';
 
 export default function ScanRoute() {
   const router = useRouter();
+  const params = useLocalSearchParams();
 
   const handleNavigate = (screen: string, data?: any) => {
     switch (screen) {
@@ -21,5 +22,5 @@ export default function ScanRoute() {
     }
   };
 
-  return <ScanScreen onNavigate={handleNavigate} />;
+  return <ScanScreen onNavigate={handleNavigate} autoScan={params.autoScan === 'true'} />;
 }
