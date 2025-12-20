@@ -45,3 +45,6 @@ yarn-error.*
 todo.md
 agora/
 pdf-backend/
+
+# Voice agent environment
+voice-agent/.env.local

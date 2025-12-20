@@ -36,6 +36,10 @@ export function BottomNav() {
         <TouchableOpacity
           onPress={handleScanPress}
           className="w-32 h-32 bg-green-400 rounded-full items-center justify-center border-4 border-white"
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Scan medication or document"
+          accessibilityHint="Double tap to choose between scanning medication or document"
         >
           <Scan size={40} color="white" />
         </TouchableOpacity>
@@ -79,6 +83,10 @@ export function BottomNav() {
                 key={item.key}
                 onPress={() => router.push(item.path as any)}
                 className={`flex flex-col items-center gap-1 py-2 px-2 rounded-xl ${extraStyle}`}
+                accessible={true}
+                accessibilityRole="tab"
+                accessibilityLabel={item.label}
+                accessibilityState={{ selected: isActive }}
               >
                 {renderIcon()}
                 <Text className={`text-[10px] font-medium ${
@@ -114,6 +122,10 @@ export function BottomNav() {
             <TouchableOpacity
               onPress={handleAddMedication}
               className="flex-row items-center bg-blue-50 p-4 rounded-xl mb-3"
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add medication by scanning"
+              accessibilityHint="Double tap to scan a medication bottle or package"
             >
               <Plus size={24} color="#3b82f6" />
               <Text className="text-blue-600 font-semibold text-lg ml-3">
@@ -124,6 +136,10 @@ export function BottomNav() {
             <TouchableOpacity
               onPress={handleScanDocument}
               className="flex-row items-center bg-green-50 p-4 rounded-xl mb-4"
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Scan document"
+              accessibilityHint="Double tap to scan a document or image"
             >
               <Camera size={24} color="#10b981" />
               <Text className="text-green-600 font-semibold text-lg ml-3">

@@ -8,6 +8,7 @@ import { useApp } from '../contexts/AppContext';
 import { ProgressRing } from './ProgressRing';
 import { BottomNav } from './BottomNav';
 import { supabase } from '../services/supabase';
+import { announceForAccessibility } from '../hooks/useAccessibility';
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;
@@ -24,6 +25,25 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleToggleMedication = async (id: string) => {
+    const medication = state.medications.find(m => m.id === id);
+    if (medication) {
+      await toggleMedication(id);
+      const newStatus = !medication.taken;
+      announceForAccessibility(
+        `${medication.name} marked as ${newStatus ? 'taken' : 'not taken'}`
+      );
+    }
+  };
+
+  const handleRemoveMedication = async (id: string) => {
+    const medication = state.medications.find(m => m.id === id);
+    if (medication) {
+      await removeMedication(id);
+      announceForAccessibility(`${medication.name} removed from your medications`);
     }
   };
   
@@ -53,7 +73,12 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="text-gray-500 text-sm">Good morning</Text>
-                <Text className="text-2xl font-bold text-gray-900">Dashboard</Text>
+                <Text 
+                  className="text-2xl font-bold text-gray-900"
+                  accessibilityRole="header"
+                >
+                  Dashboard
+                </Text>
               </View>
               <View className="flex-row items-center space-x-2">
                 <TouchableOpacity onPress={handleSignOut}>
@@ -102,7 +127,13 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                       {nextMed.dosage} • {nextMed.time}
                     </Text>
                   </View>
-                  <TouchableOpacity onPress={() => toggleMedication(nextMed.id)}>
+                  <TouchableOpacity 
+                    onPress={() => handleToggleMedication(nextMed.id)}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Take ${nextMed.name} now`}
+                    accessibilityHint="Double tap to mark this medication as taken"
+                  >
                     <View className="bg-blue-500 px-4 py-2 rounded-xl">
                       <Text className="text-white font-medium text-lg">
                         Take Now
@@ -116,7 +147,10 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
           {/* Today's Medications */}
           <View className="px-4">
-            <Text className="text-xl font-semibold text-gray-900 mb-4">
+            <Text 
+              className="text-xl font-semibold text-gray-900 mb-4"
+              accessibilityRole="header"
+            >
               Today's Schedule
             </Text>
             <View>
@@ -134,8 +168,12 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                     <View className="p-4">
                       <View className="flex-row items-center justify-between">
                         <TouchableOpacity 
-                          onPress={() => toggleMedication(med.id)}
+                          onPress={() => handleToggleMedication(med.id)}
                           className="flex-1 flex-row items-center justify-between"
+                          accessible={true}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${med.name}, ${med.dosage} at ${med.time}, ${med.taken ? 'taken' : 'not taken'}`}
+                          accessibilityHint={med.taken ? 'Double tap to mark as not taken' : 'Double tap to mark as taken'}
                         >
                           <View className="flex-1">
                             <Text className={`text-xl font-medium ${
@@ -161,8 +199,13 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                         </TouchableOpacity>
                         
                         <TouchableOpacity
-                          onPress={() => removeMedication(med.id)}
+                          onPress={() => handleRemoveMedication(med.id)}
                           className="ml-3 p-2 rounded-full bg-red-50"
+                          accessible={true}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Delete ${med.name}`}
+                          accessibilityHint="Double tap to permanently remove this medication"
+                          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                         >
                           <X size={16} color="#dc2626" />
                         </TouchableOpacity>

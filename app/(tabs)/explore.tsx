@@ -69,6 +69,9 @@ export default function AddMedicationScreen() {
                   placeholderTextColor="#9ca3af"
                   value={medication.name}
                   onChangeText={(text) => setMedication(prev => ({ ...prev, name: text }))}
+                  accessible={true}
+                  accessibilityLabel="Medication name"
+                  accessibilityHint="Enter the name of your medication"
                 />
               </View>
 
@@ -122,6 +125,11 @@ export default function AddMedicationScreen() {
                 }`}
                 onPress={handleSave}
                 disabled={!medication.name || !medication.dosage || !medication.time}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Add medication"
+                accessibilityHint="Double tap to save this medication to your schedule"
+                accessibilityState={{ disabled: !medication.name || !medication.dosage || !medication.time }}
               >
                 <Text className={`text-center text-lg font-semibold ${
                   medication.name && medication.dosage && medication.time ? 'text-white' : 'text-gray-500'

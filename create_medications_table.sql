@@ -24,3 +24,4 @@ CREATE POLICY "Users can only see their own medications" ON medications
 
 CREATE POLICY "Users can only insert with their own user_id" ON medications
   FOR INSERT WITH CHECK (auth.uid() = user_id);
+
