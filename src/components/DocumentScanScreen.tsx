@@ -124,94 +124,75 @@ export function DocumentScanScreen({ onNavigate }: DocumentScanScreenProps) {
   };
 
   return (
-    <View className="flex-1">
-      <LinearGradient
-        colors={['#1e293b', '#0f172a', '#020617']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
-
+    <View className="flex-1 bg-gray-100">
       <SafeAreaView className="flex-1">
-        <View className="flex-1 justify-center items-center p-6">
-          <View className="mb-8">
-            <Text className="text-3xl font-bold text-foreground text-center mb-2">
-              Document OCR
-            </Text>
-            <Text className="text-muted-foreground text-center">
-              Scan or upload documents to extract text
-            </Text>
-          </View>
+        {/* Header */}
+        <View className="bg-white px-6 py-8 shadow-sm mb-6">
+          <Text className="text-3xl font-bold text-gray-900 mb-2">Document OCR</Text>
+          <Text className="text-gray-500 text-base">
+            Scan or upload documents to extract text
+          </Text>
+        </View>
 
+        <View className="flex-1 px-4">
           {/* Title Input */}
-          <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-border/30 mb-6 w-full">
-            <LinearGradient
-              colors={['rgba(30, 41, 59, 0.4)', 'rgba(15, 23, 42, 0.2)']}
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          <View className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+            <Text className="text-lg font-semibold text-gray-900 mb-3">Document Title</Text>
+            <TextInput
+              value={title}
+              onChangeText={setTitle}
+              placeholder="Enter document title"
+              placeholderTextColor="#9ca3af"
+              className="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 text-base"
             />
-            <View className="p-4">
-              <Text className="text-foreground font-medium mb-2">Document Title</Text>
-              <TextInput
-                value={title}
-                onChangeText={setTitle}
-                placeholder="Enter document title"
-                placeholderTextColor="#64748b"
-                className="text-foreground text-lg"
-                style={{ color: '#f8fafc' }}
-              />
-            </View>
-          </BlurView>
+          </View>
 
           {/* Action Buttons */}
-          <View className="w-full space-y-4 mb-8">
-            <TouchableOpacity onPress={scanDocument} disabled={isProcessing}>
-              <BlurView intensity={60} className="rounded-3xl overflow-hidden border border-border/30">
-                <LinearGradient
-                  colors={['rgba(30, 41, 59, 0.6)', 'rgba(15, 23, 42, 0.4)']}
-                  style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                />
-                <View className="p-6 items-center">
-                  {isProcessing ? (
-                    <ActivityIndicator size="large" color="#94a3b8" />
-                  ) : (
-                    <Text className="text-4xl mb-2">📷</Text>
-                  )}
-                  <Text className="text-xl font-semibold text-foreground mb-1">
-                    {isProcessing ? 'Processing...' : 'Scan Document'}
-                  </Text>
-                  <Text className="text-muted-foreground text-center text-sm">
-                    Take a photo of your document
-                  </Text>
-                </View>
-              </BlurView>
+          <View className="space-y-4 mb-8">
+            <TouchableOpacity 
+              onPress={scanDocument} 
+              disabled={isProcessing}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+            >
+              <View className="items-center">
+                {isProcessing ? (
+                  <ActivityIndicator size="large" color="#3b82f6" />
+                ) : (
+                  <Text className="text-4xl mb-3">📷</Text>
+                )}
+                <Text className="text-xl font-semibold text-gray-900 mb-2">
+                  {isProcessing ? 'Processing...' : 'Scan Document'}
+                </Text>
+                <Text className="text-gray-500 text-center">
+                  Take a photo of your document
+                </Text>
+              </View>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={uploadDocument} disabled={isProcessing}>
-              <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-border/30">
-                <LinearGradient
-                  colors={['rgba(30, 41, 59, 0.4)', 'rgba(15, 23, 42, 0.2)']}
-                  style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                />
-                <View className="p-4 items-center">
-                  <Text className="text-2xl mb-2">📁</Text>
-                  <Text className="text-lg font-semibold text-foreground mb-1">
-                    📄 Upload Image/PDF
-                  </Text>
-                  <Text className="text-muted-foreground text-center text-sm">
-                    Choose from photo library
-                  </Text>
-                </View>
-              </BlurView>
+            <TouchableOpacity 
+              onPress={uploadDocument} 
+              disabled={isProcessing}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+            >
+              <View className="items-center">
+                <Text className="text-2xl mb-3">📁</Text>
+                <Text className="text-lg font-semibold text-gray-900 mb-2">
+                  📄 Upload Image/PDF
+                </Text>
+                <Text className="text-gray-500 text-center">
+                  Choose from photo library
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity onPress={() => onNavigate('dashboard')}>
-            <LinearGradient
-              colors={['#94a3b8', '#64748b']}
-              style={{ paddingHorizontal: 24, paddingVertical: 12, borderRadius: 16 }}
-            >
-              <Text className="text-primary-foreground font-medium">
-                Back to Dashboard
-              </Text>
-            </LinearGradient>
+          <TouchableOpacity 
+            onPress={() => onNavigate('dashboard')}
+            className="bg-gray-400 rounded-2xl p-4 mb-6"
+          >
+            <Text className="text-white font-semibold text-center">
+              Back to Dashboard
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

@@ -151,80 +151,70 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
   }
 
   return (
-    <View className="flex-1">
-      <LinearGradient
-        colors={['#1e293b', '#0f172a', '#020617']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
-
+    <View className="flex-1 bg-gray-100">
       <SafeAreaView className="flex-1">
-        <View className="flex-1 p-6">
-          <View className="mb-6">
-            <Text className="text-3xl font-bold text-white text-center mb-2">
-              My Documents
-            </Text>
-            <Text className="text-gray-400 text-center mb-4">
-              {documents.length} documents saved
-            </Text>
-            
-            {/* Search Bar */}
-            <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-gray-600">
-              <View className="p-4 flex-row items-center">
-                <TextInput
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Search documents..."
-                  placeholderTextColor="#64748b"
-                  className="flex-1 text-white text-lg mr-3"
-                  style={{ color: '#f8fafc' }}
-                />
-                <TouchableOpacity onPress={performSearch} disabled={isSearching}>
-                  <LinearGradient
-                    colors={['#3b82f6', '#1d4ed8']}
-                    className="rounded-xl px-4 py-2"
-                  >
-                    <Text className="text-white font-medium">
-                      {isSearching ? '🔍' : 'Search'}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </BlurView>
+        {/* Header */}
+        <View className="bg-white px-6 py-8 shadow-sm mb-6">
+          <Text className="text-3xl font-bold text-gray-900 mb-2">My Documents</Text>
+          <Text className="text-gray-500 text-base">
+            {documents.length} documents saved
+          </Text>
+        </View>
+
+        <View className="flex-1 px-4">
+          {/* Search Bar */}
+          <View className="bg-white rounded-2xl p-4 shadow-sm mb-6">
+            <View className="flex-row items-center">
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search documents..."
+                placeholderTextColor="#9ca3af"
+                className="flex-1 text-gray-900 text-base mr-3 p-3 bg-gray-50 rounded-xl border border-gray-200"
+              />
+              <TouchableOpacity 
+                onPress={performSearch} 
+                disabled={isSearching}
+                className="bg-blue-500 rounded-xl px-4 py-3"
+              >
+                <Text className="text-white font-semibold">
+                  {isSearching ? '🔍' : 'Search'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {isLoading ? (
             <View className="flex-1 justify-center items-center">
               <ActivityIndicator size="large" color="#3b82f6" />
-              <Text className="text-gray-400 mt-4">Loading documents...</Text>
+              <Text className="text-gray-500 mt-4">Loading documents...</Text>
             </View>
           ) : documents.length === 0 ? (
             <View className="flex-1 justify-center items-center">
-              <Text className="text-gray-400 text-center mb-4">
+              <Text className="text-gray-500 text-center mb-6 text-lg">
                 No documents yet.{'\n'}Scan some documents to see them here!
               </Text>
-              <TouchableOpacity onPress={() => onNavigate('document-scan')}>
-                <LinearGradient
-                  colors={['#3b82f6', '#1d4ed8']}
-                  className="rounded-2xl px-6 py-3"
-                >
-                  <Text className="text-white font-semibold">Scan Document</Text>
-                </LinearGradient>
+              <TouchableOpacity 
+                onPress={() => onNavigate('document-scan')}
+                className="bg-blue-500 rounded-2xl px-6 py-4"
+              >
+                <Text className="text-white font-semibold text-base">Scan Document</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
               {documents.map((doc, index) => (
                 <View key={doc.id} className="mb-4">
-                  <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-gray-600">
-                    <View className="p-4 flex-row">
+                  <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
+                    <View className="flex-row">
                       <TouchableOpacity onPress={() => showDocument(doc)} className="flex-1">
-                        <Text className="text-white font-semibold text-lg mb-2">
+                        <Text className="text-gray-900 font-semibold text-lg mb-2">
                           {doc.title}
                         </Text>
-                        <Text className="text-gray-400 text-sm mb-2">
+                        <Text className="text-gray-500 text-sm mb-2">
                           {new Date(doc.created_at).toLocaleDateString()}
                         </Text>
-                        <Text className="text-gray-300 text-sm" numberOfLines={3}>
+                        <Text className="text-gray-600 text-sm" numberOfLines={3}>
                           {doc.content}
                         </Text>
                       </TouchableOpacity>
@@ -232,53 +222,49 @@ export function DocumentsViewer({ onNavigate }: DocumentsViewerProps) {
                       <View className="ml-3 flex-col space-y-2">
                         <TouchableOpacity
                           onPress={() => viewDocument(doc)}
-                          className="justify-center items-center w-10 h-10 rounded-full bg-green-500/20"
+                          className="justify-center items-center w-10 h-10 rounded-full bg-green-50"
                         >
-                          <Text className="text-green-400 text-lg">👁️</Text>
+                          <Text className="text-green-600 text-lg">👁️</Text>
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
                           onPress={() => editDocument(doc)} 
-                          className="justify-center items-center w-10 h-10 rounded-full bg-blue-500/20"
+                          className="justify-center items-center w-10 h-10 rounded-full bg-blue-50"
                         >
-                          <Text className="text-blue-400 text-lg">✏️</Text>
+                          <Text className="text-blue-600 text-lg">✏️</Text>
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
                           onPress={() => confirmDelete(doc)} 
-                          className="justify-center items-center w-10 h-10 rounded-full bg-red-500/20"
+                          className="justify-center items-center w-10 h-10 rounded-full bg-red-50"
                         >
-                          <Text className="text-red-400 text-lg">🗑️</Text>
+                          <Text className="text-red-600 text-lg">🗑️</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
-                  </BlurView>
+                  </View>
                 </View>
               ))}
             </ScrollView>
           )}
 
-          <View className="flex-row space-x-4 mt-6">
-            <TouchableOpacity onPress={() => onNavigate('document-scan')} className="flex-1">
-              <LinearGradient
-                colors={['#3b82f6', '#1d4ed8']}
-                className="rounded-2xl p-4"
-              >
-                <Text className="text-white text-center font-semibold">
-                  Scan New Document
-                </Text>
-              </LinearGradient>
+          <View className="flex-row space-x-4 mt-6 mb-6">
+            <TouchableOpacity 
+              onPress={() => onNavigate('document-scan')} 
+              className="flex-1 bg-blue-500 rounded-2xl p-4"
+            >
+              <Text className="text-white text-center font-semibold">
+                Scan New Document
+              </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => onNavigate('dashboard')} className="flex-1">
-              <LinearGradient
-                colors={['#94a3b8', '#64748b']}
-                className="rounded-2xl p-4"
-              >
-                <Text className="text-white text-center font-semibold">
-                  Back to Dashboard
-                </Text>
-              </LinearGradient>
+            <TouchableOpacity 
+              onPress={() => onNavigate('dashboard')} 
+              className="flex-1 bg-gray-400 rounded-2xl p-4"
+            >
+              <Text className="text-white text-center font-semibold">
+                Back to Dashboard
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

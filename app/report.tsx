@@ -82,88 +82,91 @@ export default function ReportScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-gray-100">
       <SafeAreaView className="flex-1">
         <ScrollView 
           className="flex-1" 
           contentContainerStyle={{ paddingBottom: 140 }}
           showsVerticalScrollIndicator={false}
         >
-          <View className="p-6">
-            <View className="flex-row items-center justify-between mb-8">
+          {/* Header */}
+          <View className="bg-white px-6 py-8 shadow-sm mb-6">
+            <View className="flex-row items-center justify-between">
               <TouchableOpacity onPress={() => router.back()}>
-                <Text className="text-primary text-lg">← Back</Text>
+                <Text className="text-blue-500 text-lg font-medium">← Back</Text>
               </TouchableOpacity>
-              <Text className="text-2xl font-bold text-foreground">Reports</Text>
+              <Text className="text-3xl font-bold text-gray-900">Reports</Text>
               <View className="w-12" />
             </View>
+          </View>
 
+          <View className="px-4">
             {/* Medication Summary */}
-            <View className="bg-card rounded-2xl p-6 mb-6 border border-border">
-              <Text className="text-xl font-semibold text-foreground mb-4">💊 Medication Summary</Text>
+            <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-200">
+              <Text className="text-xl font-semibold text-gray-900 mb-4">💊 Medication Summary</Text>
               <View className="flex-row justify-between items-center mb-3">
-                <Text className="text-muted-foreground">Total Active Medications</Text>
-                <Text className="text-2xl font-bold text-primary">{medications.length}</Text>
+                <Text className="text-gray-500">Total Active Medications</Text>
+                <Text className="text-2xl font-bold text-blue-500">{medications.length}</Text>
               </View>
               <View className="flex-row justify-between items-center mb-3">
-                <Text className="text-muted-foreground">Taken Today</Text>
+                <Text className="text-gray-500">Taken Today</Text>
                 <Text className="text-lg font-semibold text-green-500">
                   {medications.filter(m => m.taken).length}/{medications.length}
                 </Text>
               </View>
               <View className="flex-row justify-between items-center">
-                <Text className="text-muted-foreground">Current Streak</Text>
+                <Text className="text-gray-500">Current Streak</Text>
                 <Text className="text-lg font-semibold text-orange-500">{state.streak} days</Text>
               </View>
             </View>
 
             {/* Adherence Report */}
-            <View className="bg-card rounded-2xl p-6 mb-6 border border-border">
-              <Text className="text-xl font-semibold text-foreground mb-4">📈 Adherence Report</Text>
+            <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-200">
+              <Text className="text-xl font-semibold text-gray-900 mb-4">📈 Adherence Report</Text>
               <View className="space-y-4">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-muted-foreground">This Week</Text>
+                  <Text className="text-gray-500">This Week</Text>
                   <View className="flex-row items-center">
-                    <View className="w-20 h-2 bg-muted rounded-full mr-3">
+                    <View className="w-20 h-2 bg-gray-200 rounded-full mr-3">
                       <View className="h-2 bg-green-500 rounded-full" style={{width: `${adherenceData.thisWeek}%`}} />
                     </View>
-                    <Text className="text-foreground font-semibold">{adherenceData.thisWeek}%</Text>
+                    <Text className="text-gray-900 font-semibold">{adherenceData.thisWeek}%</Text>
                   </View>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-muted-foreground">Last Week</Text>
+                  <Text className="text-gray-500">Last Week</Text>
                   <View className="flex-row items-center">
-                    <View className="w-20 h-2 bg-muted rounded-full mr-3">
+                    <View className="w-20 h-2 bg-gray-200 rounded-full mr-3">
                       <View className="h-2 bg-blue-500 rounded-full" style={{width: `${adherenceData.lastWeek}%`}} />
                     </View>
-                    <Text className="text-foreground font-semibold">{adherenceData.lastWeek}%</Text>
+                    <Text className="text-gray-900 font-semibold">{adherenceData.lastWeek}%</Text>
                   </View>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-muted-foreground">This Month</Text>
+                  <Text className="text-gray-500">This Month</Text>
                   <View className="flex-row items-center">
-                    <View className="w-20 h-2 bg-muted rounded-full mr-3">
+                    <View className="w-20 h-2 bg-gray-200 rounded-full mr-3">
                       <View className="h-2 bg-purple-500 rounded-full" style={{width: `${adherenceData.thisMonth}%`}} />
                     </View>
-                    <Text className="text-foreground font-semibold">{adherenceData.thisMonth}%</Text>
+                    <Text className="text-gray-900 font-semibold">{adherenceData.thisMonth}%</Text>
                   </View>
                 </View>
               </View>
             </View>
 
             {/* Medical History */}
-            <View className="bg-card rounded-2xl p-6 mb-6 border border-border">
-              <Text className="text-xl font-semibold text-foreground mb-4">🩺 Medical History</Text>
+            <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-200">
+              <Text className="text-xl font-semibold text-gray-900 mb-4">🩺 Medical History</Text>
               
               {/* Blood Pressure */}
-              <View className="mb-4 p-4 bg-muted/30 rounded-xl">
+              <View className="mb-4 p-4 bg-gray-50 rounded-xl">
                 <View className="flex-row justify-between items-center mb-2">
-                  <Text className="text-foreground font-medium">Blood Pressure</Text>
+                  <Text className="text-gray-900 font-medium">Blood Pressure</Text>
                   <TouchableOpacity 
                     onPress={() => setShowBPForm(!showBPForm)}
-                    className="bg-primary px-3 py-1 rounded-full"
+                    className="bg-blue-500 px-3 py-1 rounded-full"
                   >
-                    <Text className="text-primary-foreground text-sm font-medium">
+                    <Text className="text-white text-sm font-medium">
                       {showBPForm ? 'Cancel' : '+ Add'}
                     </Text>
                   </TouchableOpacity>
@@ -173,9 +176,9 @@ export default function ReportScreen() {
                   <View className="space-y-3">
                     <View className="flex-row gap-3">
                       <View className="flex-1">
-                        <Text className="text-muted-foreground text-sm mb-1">Systolic</Text>
+                        <Text className="text-gray-500 text-sm mb-1">Systolic</Text>
                         <TextInput
-                          className="bg-background border border-border rounded-lg px-3 py-2 text-foreground"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
                           placeholder="120"
                           value={bpSystolic}
                           onChangeText={setBpSystolic}
@@ -183,9 +186,9 @@ export default function ReportScreen() {
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-muted-foreground text-sm mb-1">Diastolic</Text>
+                        <Text className="text-gray-500 text-sm mb-1">Diastolic</Text>
                         <TextInput
-                          className="bg-background border border-border rounded-lg px-3 py-2 text-foreground"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
                           placeholder="80"
                           value={bpDiastolic}
                           onChangeText={setBpDiastolic}
@@ -203,32 +206,32 @@ export default function ReportScreen() {
                 ) : (
                   <>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">Latest Reading</Text>
-                      <Text className="text-foreground font-semibold">
+                      <Text className="text-gray-500">Latest Reading</Text>
+                      <Text className="text-gray-900 font-semibold">
                         {state.medicalHistory.bloodPressure.systolic}/{state.medicalHistory.bloodPressure.diastolic} mmHg
                       </Text>
                     </View>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">Status</Text>
+                      <Text className="text-gray-500">Status</Text>
                       <Text className={`font-medium ${
                         state.medicalHistory.bloodPressure.status === 'High' ? 'text-red-500' :
                         state.medicalHistory.bloodPressure.status === 'Low' ? 'text-yellow-500' : 'text-green-500'
                       }`}>{state.medicalHistory.bloodPressure.status}</Text>
                     </View>
-                    <Text className="text-muted-foreground text-sm">Last checked: {state.medicalHistory.bloodPressure.date}</Text>
+                    <Text className="text-gray-500 text-sm">Last checked: {state.medicalHistory.bloodPressure.date}</Text>
                   </>
                 )}
               </View>
 
               {/* Cholesterol */}
-              <View className="mb-4 p-4 bg-muted/30 rounded-xl">
+              <View className="mb-4 p-4 bg-gray-50 rounded-xl">
                 <View className="flex-row justify-between items-center mb-2">
-                  <Text className="text-foreground font-medium">Cholesterol</Text>
+                  <Text className="text-gray-900 font-medium">Cholesterol</Text>
                   <TouchableOpacity 
                     onPress={() => setShowCholesterolForm(!showCholesterolForm)}
-                    className="bg-primary px-3 py-1 rounded-full"
+                    className="bg-blue-500 px-3 py-1 rounded-full"
                   >
-                    <Text className="text-primary-foreground text-sm font-medium">
+                    <Text className="text-white text-sm font-medium">
                       {showCholesterolForm ? 'Cancel' : '+ Add'}
                     </Text>
                   </TouchableOpacity>
@@ -238,9 +241,9 @@ export default function ReportScreen() {
                   <View className="space-y-3">
                     <View className="flex-row gap-2">
                       <View className="flex-1">
-                        <Text className="text-muted-foreground text-sm mb-1">Total</Text>
+                        <Text className="text-gray-500 text-sm mb-1">Total</Text>
                         <TextInput
-                          className="bg-background border border-border rounded-lg px-3 py-2 text-foreground"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
                           placeholder="200"
                           value={cholTotal}
                           onChangeText={setCholTotal}
@@ -248,9 +251,9 @@ export default function ReportScreen() {
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-muted-foreground text-sm mb-1">LDL</Text>
+                        <Text className="text-gray-500 text-sm mb-1">LDL</Text>
                         <TextInput
-                          className="bg-background border border-border rounded-lg px-3 py-2 text-foreground"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
                           placeholder="100"
                           value={cholLDL}
                           onChangeText={setCholLDL}
@@ -258,9 +261,9 @@ export default function ReportScreen() {
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-muted-foreground text-sm mb-1">HDL</Text>
+                        <Text className="text-gray-500 text-sm mb-1">HDL</Text>
                         <TextInput
-                          className="bg-background border border-border rounded-lg px-3 py-2 text-foreground"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900"
                           placeholder="50"
                           value={cholHDL}
                           onChangeText={setCholHDL}
@@ -278,57 +281,57 @@ export default function ReportScreen() {
                 ) : (
                   <>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">Total</Text>
-                      <Text className="text-foreground font-semibold">{state.medicalHistory.cholesterol.total} mg/dL</Text>
+                      <Text className="text-gray-500">Total</Text>
+                      <Text className="text-gray-900 font-semibold">{state.medicalHistory.cholesterol.total} mg/dL</Text>
                     </View>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">LDL</Text>
-                      <Text className="text-foreground font-semibold">{state.medicalHistory.cholesterol.ldl} mg/dL</Text>
+                      <Text className="text-gray-500">LDL</Text>
+                      <Text className="text-gray-900 font-semibold">{state.medicalHistory.cholesterol.ldl} mg/dL</Text>
                     </View>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">HDL</Text>
-                      <Text className="text-foreground font-semibold">{state.medicalHistory.cholesterol.hdl} mg/dL</Text>
+                      <Text className="text-gray-500">HDL</Text>
+                      <Text className="text-gray-900 font-semibold">{state.medicalHistory.cholesterol.hdl} mg/dL</Text>
                     </View>
                     <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-muted-foreground">Status</Text>
+                      <Text className="text-gray-500">Status</Text>
                       <Text className={`font-medium ${
                         state.medicalHistory.cholesterol.status === 'High' ? 'text-red-500' :
                         state.medicalHistory.cholesterol.status === 'Borderline' ? 'text-yellow-500' : 'text-green-500'
                       }`}>{state.medicalHistory.cholesterol.status}</Text>
                     </View>
-                    <Text className="text-muted-foreground text-sm">Last checked: {state.medicalHistory.cholesterol.date}</Text>
+                    <Text className="text-gray-500 text-sm">Last checked: {state.medicalHistory.cholesterol.date}</Text>
                   </>
                 )}
               </View>
 
               {/* Thyroid */}
-              <View className="mb-4 p-4 bg-muted/30 rounded-xl">
-                <Text className="text-foreground font-medium mb-2">Thyroid</Text>
+              <View className="mb-4 p-4 bg-gray-50 rounded-xl">
+                <Text className="text-gray-900 font-medium mb-2">Thyroid</Text>
                 <View className="flex-row justify-between items-center mb-1">
-                  <Text className="text-muted-foreground">Condition</Text>
-                  <Text className="text-foreground font-semibold">Hypothyroidism</Text>
+                  <Text className="text-gray-500">Condition</Text>
+                  <Text className="text-gray-900 font-semibold">Hypothyroidism</Text>
                 </View>
                 <View className="flex-row justify-between items-center mb-1">
-                  <Text className="text-muted-foreground">Duration</Text>
-                  <Text className="text-foreground font-semibold">5 years</Text>
+                  <Text className="text-gray-500">Duration</Text>
+                  <Text className="text-gray-900 font-semibold">5 years</Text>
                 </View>
                 <View className="flex-row justify-between items-center mb-1">
-                  <Text className="text-muted-foreground">Status</Text>
+                  <Text className="text-gray-500">Status</Text>
                   <Text className="text-green-500 font-medium">Controlled</Text>
                 </View>
-                <Text className="text-muted-foreground text-sm">Diagnosed: 2019</Text>
+                <Text className="text-gray-500 text-sm">Diagnosed: 2019</Text>
               </View>
 
               {/* Current Medications */}
-              <View className="p-4 bg-muted/30 rounded-xl">
-                <Text className="text-foreground font-medium mb-2">Current Medications</Text>
+              <View className="p-4 bg-gray-50 rounded-xl">
+                <Text className="text-gray-900 font-medium mb-2">Current Medications</Text>
                 {medications.length === 0 ? (
-                  <Text className="text-muted-foreground">No medications added</Text>
+                  <Text className="text-gray-500">No medications added</Text>
                 ) : (
                   medications.map((med, index) => (
                     <View key={index} className="flex-row justify-between items-center py-1">
-                      <Text className="text-foreground">{med.name}</Text>
-                      <Text className="text-muted-foreground text-sm">{med.dosage}</Text>
+                      <Text className="text-gray-900">{med.name}</Text>
+                      <Text className="text-gray-500 text-sm">{med.dosage}</Text>
                     </View>
                   ))
                 )}
@@ -336,26 +339,26 @@ export default function ReportScreen() {
             </View>
 
             {/* Family Medical History */}
-            <View className="bg-card rounded-2xl p-6 mb-6 border border-border">
-              <Text className="text-xl font-semibold text-foreground mb-4">👨‍👩‍👧‍👦 Family Medical History</Text>
+            <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-200">
+              <Text className="text-xl font-semibold text-gray-900 mb-4">👨‍👩‍👧‍👦 Family Medical History</Text>
               {familyHistory.map((item, index) => (
-                <View key={index} className="mb-4 p-4 bg-muted/30 rounded-xl">
-                  <Text className="text-foreground font-medium mb-1">{item.condition}</Text>
-                  <Text className="text-muted-foreground mb-1">{item.relation}</Text>
-                  <Text className="text-muted-foreground text-sm">{item.age}</Text>
+                <View key={index} className="mb-4 p-4 bg-gray-50 rounded-xl">
+                  <Text className="text-gray-900 font-medium mb-1">{item.condition}</Text>
+                  <Text className="text-gray-500 mb-1">{item.relation}</Text>
+                  <Text className="text-gray-500 text-sm">{item.age}</Text>
                 </View>
               ))}
             </View>
 
             {/* Allergies */}
-            <View className="bg-card rounded-2xl p-6 mb-6 border border-border">
+            <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-200">
               <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-xl font-semibold text-foreground">⚠️ Allergies & Reactions</Text>
+                <Text className="text-xl font-semibold text-gray-900">⚠️ Allergies & Reactions</Text>
                 <TouchableOpacity 
                   onPress={() => setShowAllergyForm(!showAllergyForm)}
-                  className="bg-primary px-3 py-1 rounded-full"
+                  className="bg-blue-500 px-3 py-1 rounded-full"
                 >
-                  <Text className="text-primary-foreground text-sm font-medium">
+                  <Text className="text-white text-sm font-medium">
                     {showAllergyForm ? 'Cancel' : '+ Add'}
                   </Text>
                 </TouchableOpacity>

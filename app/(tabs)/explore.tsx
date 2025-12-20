@@ -38,101 +38,101 @@ export default function AddMedicationScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-gray-100">
       <SafeAreaView className="flex-1">
         <ScrollView 
           className="flex-1" 
           contentContainerStyle={{ paddingBottom: 140 }}
           showsVerticalScrollIndicator={false}
         >
-          <View className="p-6">
           {/* Header */}
-          <View className="mb-8">
-            <Text className="text-2xl font-bold text-foreground">Add Medication</Text>
-            <Text className="text-muted-foreground">
+          <View className="bg-white px-6 py-8 shadow-sm mb-6">
+            <Text className="text-3xl font-bold text-gray-900 mb-2">Add Medication</Text>
+            <Text className="text-gray-500 text-base">
               {params.prefilled ? 'Information detected from scan' : 'Add a new medication to your schedule'}
             </Text>
             {params.prefilled && (
-              <Text className="text-green-400 text-sm mt-1">
+              <Text className="text-green-600 text-sm mt-2 font-medium">
                 ✓ Scanned data loaded
               </Text>
             )}
           </View>
 
           {/* Form */}
-          <View className="flex-1">
-            <View className="mb-6">
-              <Text className="text-lg font-medium text-foreground mb-3">Medication Name *</Text>
-              <TextInput
-                className="w-full p-4 border border-border rounded-xl bg-muted/50 text-foreground"
-                placeholder="e.g., Aspirin"
-                placeholderTextColor="#9ca3af"
-                value={medication.name}
-                onChangeText={(text) => setMedication(prev => ({ ...prev, name: text }))}
-              />
-            </View>
-
-            <View className="mb-6">
-              <Text className="text-lg font-medium text-foreground mb-3">Dosage *</Text>
-              <TextInput
-                className="w-full p-4 border border-border rounded-xl bg-muted/50 text-foreground"
-                placeholder="e.g., 500mg"
-                placeholderTextColor="#9ca3af"
-                value={medication.dosage}
-                onChangeText={(text) => setMedication(prev => ({ ...prev, dosage: text }))}
-              />
-            </View>
-
-            <View className="mb-6">
-              <Text className="text-lg font-medium text-foreground mb-3">Time *</Text>
-              <TextInput
-                className="w-full p-4 border border-border rounded-xl bg-muted/50 text-foreground"
-                placeholder="e.g., 08:00"
-                placeholderTextColor="#9ca3af"
-                value={medication.time}
-                onChangeText={(text) => setMedication(prev => ({ ...prev, time: text }))}
-              />
-            </View>
-
-            <View className="mb-8">
-              <Text className="text-lg font-medium text-foreground mb-3">Frequency</Text>
-              <View className="flex-row flex-wrap gap-3">
-                {['daily', 'weekly', 'as needed'].map((freq, index) => (
-                  <TouchableOpacity
-                    key={`freq-${index}-${freq}`}
-                    className={`px-4 py-2 rounded-xl ${
-                      medication.frequency === freq ? 'bg-primary' : 'bg-muted/50 border border-border'
-                    }`}
-                    onPress={() => setMedication(prev => ({ ...prev, frequency: freq }))}
-                  >
-                    <Text className={`font-medium ${
-                      medication.frequency === freq ? 'text-primary-foreground' : 'text-foreground'
-                    }`}>
-                      {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+          <View className="px-4">
+            <View className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+              <View className="mb-6">
+                <Text className="text-lg font-semibold text-gray-900 mb-3">Medication Name *</Text>
+                <TextInput
+                  className="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 text-base"
+                  placeholder="e.g., Aspirin"
+                  placeholderTextColor="#9ca3af"
+                  value={medication.name}
+                  onChangeText={(text) => setMedication(prev => ({ ...prev, name: text }))}
+                />
               </View>
-            </View>
 
-            {/* Save Button */}
-            <TouchableOpacity
-              className={`w-full py-4 px-6 rounded-2xl ${
-                medication.name && medication.dosage && medication.time ? 'bg-primary' : 'bg-muted'
-              }`}
-              onPress={handleSave}
-              disabled={!medication.name || !medication.dosage || !medication.time}
-            >
-              <Text className={`text-center text-lg font-semibold ${
-                medication.name && medication.dosage && medication.time ? 'text-primary-foreground' : 'text-muted-foreground'
-              }`}>
-                Add Medication
-              </Text>
-            </TouchableOpacity>
+              <View className="mb-6">
+                <Text className="text-lg font-semibold text-gray-900 mb-3">Dosage *</Text>
+                <TextInput
+                  className="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 text-base"
+                  placeholder="e.g., 500mg"
+                  placeholderTextColor="#9ca3af"
+                  value={medication.dosage}
+                  onChangeText={(text) => setMedication(prev => ({ ...prev, dosage: text }))}
+                />
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-lg font-semibold text-gray-900 mb-3">Time *</Text>
+                <TextInput
+                  className="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 text-base"
+                  placeholder="e.g., 08:00"
+                  placeholderTextColor="#9ca3af"
+                  value={medication.time}
+                  onChangeText={(text) => setMedication(prev => ({ ...prev, time: text }))}
+                />
+              </View>
+
+              <View className="mb-6">
+                <Text className="text-lg font-semibold text-gray-900 mb-3">Frequency</Text>
+                <View className="flex-row flex-wrap gap-3">
+                  {['daily', 'weekly', 'as needed'].map((freq, index) => (
+                    <TouchableOpacity
+                      key={`freq-${index}-${freq}`}
+                      className={`px-4 py-3 rounded-xl ${
+                        medication.frequency === freq ? 'bg-blue-500' : 'bg-gray-100 border border-gray-200'
+                      }`}
+                      onPress={() => setMedication(prev => ({ ...prev, frequency: freq }))}
+                    >
+                      <Text className={`font-medium ${
+                        medication.frequency === freq ? 'text-white' : 'text-gray-700'
+                      }`}>
+                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* Save Button */}
+              <TouchableOpacity
+                className={`w-full py-4 px-6 rounded-xl ${
+                  medication.name && medication.dosage && medication.time ? 'bg-blue-500' : 'bg-gray-300'
+                }`}
+                onPress={handleSave}
+                disabled={!medication.name || !medication.dosage || !medication.time}
+              >
+                <Text className={`text-center text-lg font-semibold ${
+                  medication.name && medication.dosage && medication.time ? 'text-white' : 'text-gray-500'
+                }`}>
+                  Add Medication
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
       
       {/* Bottom Navigation */}
       <BottomNav />
