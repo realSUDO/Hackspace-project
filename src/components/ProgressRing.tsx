@@ -40,7 +40,7 @@ export function ProgressRing({ progress, size = 80, strokeWidth = 8 }: ProgressR
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <Text className="text-lg font-bold text-foreground">
+      <Text className="text-3xl font-bold text-gray-900 absolute">
         {Math.round(progress)}%
       </Text>
     </View>

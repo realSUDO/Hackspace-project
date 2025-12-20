@@ -45,13 +45,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </View>
               <View className="flex-row items-center space-x-2">
                 <TouchableOpacity onPress={handleSignOut}>
-                  <View className="bg-red-500 px-4 py-2 rounded-xl">
-                    <Text className="text-white text-sm font-medium">Sign Out</Text>
-                  </View>
+                  <Text className="text-red-500 text-sm font-medium">Sign Out</Text>
                 </TouchableOpacity>
-                <View className="bg-blue-100 w-12 h-12 rounded-full items-center justify-center">
-                  <Text className="text-2xl">💊</Text>
-                </View>
               </View>
             </View>
           </View>
@@ -59,117 +54,81 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           {/* Progress Section */}
           <View className="px-4 mb-6">
             <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-              <View className="flex-row items-center gap-6">
-                <ProgressRing progress={progress} size={80} />
-                <View className="flex-1">
-                  <Text className="text-2xl font-bold text-gray-900 mb-1">
+              <View className="flex-row items-center gap-8">
+                <ProgressRing progress={progress} size={160} strokeWidth={12} />
+                <View className="flex-1 ml-4 justify-center">
+                  <Text className="text-4xl font-bold text-gray-900 mb-2">
                     {takenCount}/{totalCount}
                   </Text>
-                  <Text className="text-gray-500 mb-2">
+                  <Text className="text-gray-500 mb-3 text-xl">
                     Medications taken today
                   </Text>
                   <View className="flex-row items-center">
-                    <Text className="text-2xl mr-2">🔥</Text>
-                    <Text className="text-gray-900 font-medium">
+                    <Text className="text-4xl mr-3">🔥</Text>
+                    <Text className="text-gray-900 font-medium text-xl">
                       {state.streak} day streak
                     </Text>
                   </View>
                 </View>
               </View>
             </View>
-            </BlurView>
           </View>
 
-          {/* Next Medication with Glass Effect */}
+          {/* Next Medication */}
           {nextMed && (
-            <View className="px-6 mb-6">
-              <Text className="text-lg font-semibold text-foreground mb-3">
+            <View className="px-4 mb-6">
+              <Text className="text-xl font-semibold text-gray-900 mb-4">
                 Next Medication
               </Text>
-              <BlurView intensity={40} className="rounded-2xl overflow-hidden border border-border/30">
-                <LinearGradient
-                  colors={['rgba(30, 41, 59, 0.4)', 'rgba(15, 23, 42, 0.2)']}
-                  style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                />
-                <View className="p-4">
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-1">
-                      <Text className="text-lg font-medium text-foreground">
-                        {nextMed.name}
-                      </Text>
-                      <Text className="text-muted-foreground">
-                        {nextMed.dosage} • {nextMed.time}
+              <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-400">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-1">
+                    <Text className="text-xl font-medium text-gray-900">
+                      {nextMed.name}
+                    </Text>
+                    <Text className="text-lg text-gray-500">
+                      {nextMed.dosage} • {nextMed.time}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => toggleMedication(nextMed.id)}>
+                    <View className="bg-blue-500 px-4 py-2 rounded-xl">
+                      <Text className="text-white font-medium text-lg">
+                        Take Now
                       </Text>
                     </View>
-                    <TouchableOpacity onPress={() => toggleMedication(nextMed.id)}>
-                      <LinearGradient
-                        colors={['#94a3b8', '#64748b']}
-                        style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 }}
-                      >
-                        <Text className="text-primary-foreground font-medium">
-                          Take Now
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
                 </View>
-              </BlurView>
+              </View>
             </View>
           )}
 
-          {/* Quick Actions */}
-          <View className="px-4 mb-6">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              Quick Actions
-            </Text>
-            <View className="flex-row flex-wrap gap-3">
-              {[
-                { icon: '➕', label: 'Add Med', action: () => onNavigate('add') },
-                { icon: '🎤', label: 'AI Assistant', action: () => onNavigate('assistant') },
-                { icon: '📊', label: 'Reports', action: () => onNavigate('report') },
-                { icon: '📷', label: 'Scan', action: () => onNavigate('scan') },
-                { icon: '📄', label: 'My Documents', action: () => onNavigate('docs') },
-              ].map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className="flex-1 min-w-[45%]"
-                  onPress={item.action}
-                >
-                  <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                    <Text className="text-2xl mb-2">{item.icon}</Text>
-                    <Text className="text-gray-900 font-medium">{item.label}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Today's Medications with Glass Effect */}
-          <View className="px-6">
-            <Text className="text-lg font-semibold text-foreground mb-4">
+          {/* Today's Medications */}
+          <View className="px-4">
+            <Text className="text-xl font-semibold text-gray-900 mb-4">
               Today's Schedule
             </Text>
-            <View className="space-y-3">
-              {state.medications.map((med) => (
+            <View>
+              {state.medications.map((med, index) => (
                 <TouchableOpacity key={med.id} onPress={() => toggleMedication(med.id)}>
-                  <BlurView intensity={med.taken ? 20 : 40} className="rounded-2xl overflow-hidden border border-border/30">
-                    <LinearGradient
-                      colors={med.taken 
-                        ? ['rgba(34, 197, 94, 0.2)', 'rgba(22, 163, 74, 0.1)']
-                        : ['rgba(30, 41, 59, 0.4)', 'rgba(15, 23, 42, 0.2)']
-                      }
-                      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                    />
+                  <View 
+                    className={`bg-white border ${
+                      med.taken ? 'border-green-500' : 'border-gray-400'
+                    } shadow-sm`} 
+                    style={{ 
+                      borderRadius: 16,
+                      marginBottom: index < state.medications.length - 1 ? 10 : 0
+                    }}
+                  >
                     <View className="p-4">
                       <View className="flex-row items-center justify-between">
                         <View className="flex-1">
-                          <Text className={`text-lg font-medium ${
-                            med.taken ? 'text-green-300' : 'text-foreground'
+                          <Text className={`text-xl font-medium ${
+                            med.taken ? 'text-green-600' : 'text-gray-900'
                           }`}>
                             {med.name}
                           </Text>
-                          <Text className={`${
-                            med.taken ? 'text-green-400' : 'text-muted-foreground'
+                          <Text className={`text-lg ${
+                            med.taken ? 'text-green-500' : 'text-gray-500'
                           }`}>
                             {med.dosage} • {med.time}
                           </Text>
@@ -177,7 +136,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                         <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                           med.taken 
                             ? 'bg-green-500 border-green-500' 
-                            : 'border-muted-foreground'
+                            : 'border-gray-200'
                         }`}>
                           {med.taken && (
                             <Text className="text-white text-xs">✓</Text>
@@ -185,7 +144,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                         </View>
                       </View>
                     </View>
-                  </BlurView>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
